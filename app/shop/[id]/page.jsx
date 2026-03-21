@@ -17,6 +17,7 @@ import {
 // Import Database connection and Product model
 import { connectMongoDB } from "../../lib/mongodb";
 import Product from "../../models/Product";
+import AddToCart from "../../components/AddToCart";
 
 export default async function ProductPage({ params }) {
   // 1. Await the params object (Required in Next.js 15+)
@@ -89,7 +90,7 @@ export default async function ProductPage({ params }) {
               </p>
             </div>
 
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <div className="flex items-center text-sm text-zinc-400 mb-4">
                 <div className={`w-2 h-2 rounded-full mr-2 ${product.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
                 {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
@@ -103,7 +104,12 @@ export default async function ProductPage({ params }) {
                 <ShoppingBag className="w-5 h-5" />
                 Add to Cart
               </Button>
-            </div>
+            </div> */}
+
+            <AddToCart 
+              productId={product._id.toString()} 
+              stock={product.stock} 
+            />
             
             <div className="mt-10 grid grid-cols-2 gap-4 text-sm text-zinc-500 border-t border-zinc-800 pt-8">
               <div>

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useSession, signOut } from "next-auth/react";
+import CartDrawer from './CartDrawer';
 
 const navLinks = [
   { name: 'Home', href: '/' },
@@ -96,6 +97,8 @@ export default function Navigation({ onClose }) {
                   {link.name}
                 </Link>
               ))}
+
+              {session && <CartDrawer />}
               
               {/* Desktop Auth Button Swap */}
               {session ? (
@@ -115,18 +118,24 @@ export default function Navigation({ onClose }) {
               )}
             </nav>
 
-            {/* Mobile Menu Button */}
-            <button 
-              className="md:hidden p-2 text-white"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open Menu"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </svg>
-            </button>
+           {/* Mobile Menu Button & Cart Area */}
+            <div className="flex items-center gap-4 md:hidden">
+              
+              {/* Insert Mobile Cart Drawer Here */}
+              {session && <CartDrawer />}
+
+              <button 
+                className="p-2 text-white"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Open Menu"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              </button>
+            </div>
           </div>
         </header>
 

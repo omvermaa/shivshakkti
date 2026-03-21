@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Badge } from "../../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { Label } from "../../components/ui/label";
-import { Plus, Search, Edit, Trash2, Loader2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Loader2, ImagePlus } from "lucide-react";
 
 export default function ProductManager({ initialProducts }) {
   const [products, setProducts] = useState(initialProducts);
@@ -17,6 +17,9 @@ export default function ProductManager({ initialProducts }) {
   const [editingProduct, setEditingProduct] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // State to hold the physical file before uploading
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Filter products based on search bar
   const filteredProducts = products.filter(p => 
@@ -25,32 +28,77 @@ export default function ProductManager({ initialProducts }) {
 
   // Open modal for Adding
   const handleAddNew = () => {
-    setEditingProduct(null); // Clear form
+    setEditingProduct(null); 
+    setSelectedFile(null); // Reset file
     setIsDialogOpen(true);
   };
 
   // Open modal for Editing
   const handleEdit = (product) => {
-    setEditingProduct(product); // Fill form with existing data
+    setEditingProduct(product); 
+    setSelectedFile(null); // Reset file
     setIsDialogOpen(true);
   };
 
-  // Handle Form Submission (Add or Edit)
+  // Handle Form Submission (Uploads to Cloudinary, then saves to DB)
   const onSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
     
-    const formData = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
+    const formData = new FormData(formEl);
+    
     if (editingProduct) {
       formData.append("id", editingProduct._id);
     }
 
+    let finalImageUrl = editingProduct?.images?.[0] || "";
+
+    // 1. If a new image was selected, upload it to Cloudinary first
+    if (selectedFile) {
+      try {
+        const uploadData = new FormData();
+        uploadData.append("file", selectedFile);
+        
+        // IMPORTANT: Replace these with your actual Cloudinary details
+        const cloudName = "dxgvwi4uu";
+        uploadData.append("upload_preset", "shivshakkti_preset"); 
+
+        const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: "POST",
+          body: uploadData,
+        });
+
+        const cloudinaryData = await cloudinaryRes.json();
+
+        if (!cloudinaryRes.ok) {
+          throw new Error(cloudinaryData.error?.message || "Cloudinary upload failed");
+        }
+
+        // Get the secure link provided by Cloudinary
+        finalImageUrl = cloudinaryData.secure_url;
+      } catch (error) {
+        alert("Image upload failed: " + error.message);
+        setIsSaving(false);
+        return; // Stop the form submission if image fails
+      }
+    } else if (!editingProduct) {
+      // Prevent saving a brand new product without an image
+      alert("Please select a product image.");
+      setIsSaving(false);
+      return;
+    }
+
+    // 2. Replace the raw file in FormData with the Cloudinary URL text string
+    // This perfectly matches what your backend action expects!
+    formData.set("image", finalImageUrl);
+
+    // 3. Send the data to your MongoDB database via Server Action
     const result = await saveProduct(formData);
     
     if (result.success) {
       setIsDialogOpen(false);
-      // In a real app, you might re-fetch products here, but Server Actions + revalidatePath 
-      // will automatically refresh the parent page anyway!
+      setSelectedFile(null);
       window.location.reload(); 
     } else {
       alert("Failed to save product.");
@@ -61,8 +109,12 @@ export default function ProductManager({ initialProducts }) {
   // Handle Deletion
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      await deleteProduct(id);
-      setProducts(products.filter(p => p._id !== id)); // Optimistic UI update
+      const response = await deleteProduct(id);
+      if(response && response.success) {
+        setProducts(products.filter(p => p._id !== id)); // Optimistic UI update
+      } else {
+        window.location.reload(); // Fallback if API response structure differs
+      }
     }
   };
 
@@ -81,7 +133,10 @@ export default function ProductManager({ initialProducts }) {
         </div>
 
         {/* Add Product Modal */}
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          if(!open) setSelectedFile(null);
+          setIsDialogOpen(open);
+        }}>
           <DialogTrigger asChild>
             <Button onClick={handleAddNew} className="bg-purple-600 hover:bg-purple-700 text-white gap-2">
               <Plus className="w-4 h-4" />
@@ -124,14 +179,33 @@ export default function ProductManager({ initialProducts }) {
                   <option value="Crystals">Crystals</option>
                   <option value="Pendulums">Pendulums</option>
                   <option value="Incense">Incense</option>
+                  <option value="Jewelry">Jewelry</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
 
+              {/* Directly Upload to Cloudinary Input */}
               <div className="space-y-2">
-                <Label htmlFor="image" className="text-zinc-300">Image URL</Label>
-                <Input id="image" name="image" placeholder="https://..." defaultValue={editingProduct?.images?.[0]} className="bg-zinc-900 border-zinc-800" />
-                <p className="text-xs text-zinc-500">Paste a link from Cloudinary, Imgur, or Unsplash.</p>
+                <Label htmlFor="image" className="text-zinc-300">Product Image</Label>
+                <div className="flex items-center gap-3">
+                  <Input 
+                    id="image" 
+                    name="image" // Note: This gets overwritten with the URL in onSubmit
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => setSelectedFile(e.target.files[0])}
+                    required={!editingProduct} // Only required if it's a new product
+                    className="bg-zinc-900 border-zinc-800 text-zinc-400 file:text-zinc-100 file:bg-zinc-800 file:border-0 file:rounded-md file:px-3 file:py-1 cursor-pointer" 
+                  />
+                </div>
+                {editingProduct && !selectedFile && (
+                   <p className="text-xs text-zinc-500">Leave blank to keep current image.</p>
+                )}
+                {selectedFile && (
+                  <p className="text-xs text-purple-400 flex items-center mt-1">
+                    <ImagePlus className="w-3 h-3 mr-1" /> New image ready to upload
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -145,7 +219,7 @@ export default function ProductManager({ initialProducts }) {
                 </Button>
                 <Button type="submit" disabled={isSaving} className="bg-purple-600 hover:bg-purple-700 text-white">
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  {editingProduct ? "Update Product" : "Save Product"}
+                  {isSaving && selectedFile ? "Uploading..." : editingProduct ? "Update Product" : "Save Product"}
                 </Button>
               </div>
             </form>
