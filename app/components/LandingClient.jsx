@@ -13,6 +13,13 @@ export default function LandingClient() {
   const [isRevealed, setIsRevealed] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
 
+  useEffect(() => {
+    document.body.classList.add("custom-cursor-active");
+    return () => {
+      document.body.classList.remove("custom-cursor-active");
+    };
+  }, []);
+
   return (
     <main className="relative w-full h-screen overflow-hidden bg-[#1a1a1a] font-serif selection:bg-white/30">
       {/* --- BACKGROUND (CLOUDS) --- */}
@@ -56,13 +63,13 @@ export default function LandingClient() {
 
         <button
           onClick={() => setIsRevealed(true)}
-          className="flex flex-col items-center w-full gap-6 px-2 transition-transform duration-500 hover:scale-105 group focus:outline-none"
+          className="flex flex-col items-center w-full gap-6 px-2 transition-transform duration-500 focus:outline-none"
         >
           <div className="w-56 h-56 md:w-64 md:h-64 bg-transparent border-[1px] border-white/20 rounded-full flex flex-col items-center justify-center pointer-events-auto cursor-pointer hover:border-white/50 transition-all duration-500 hover:scale-105">
             <img
               src={logoImage.src}
               alt="ShivShakti Tarot"
-              className="w-44 h-44 md:w-64 md:h-64 rounded-full object-cover border-2 border-primary/30"
+              className="w-44 h-44 md:w-64 md:h-64 rounded-full object-cover border-2 border-primary/30 cursor-default"
               style={{
                 boxShadow: "var(--shadow-heavy)",
               }}
@@ -113,7 +120,7 @@ export default function LandingClient() {
               width="100%"
               height="100%"
               alt="Open Navigation"
-              className="object-contain w-full h-full drop-shadow-lg rounded-full mix-blend-screen"
+              className="object-contain w-full h-full drop-shadow-lg rounded-full mix-blend-screen cursor-default"
             />
           </div>
 

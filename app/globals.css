@@ -163,15 +163,21 @@
   color: #888;
 }
 
-* {
+body.custom-cursor-active,
+body.custom-cursor-active * {
   cursor: url('/cursor.svg') 16 16, auto !important;
 }
 
-button,
-button *,
-a,
-a * {
+body.custom-cursor-active button,
+body.custom-cursor-active button *,
+body.custom-cursor-active a,
+body.custom-cursor-active a *,
+body.custom-cursor-active .cursor-pointer {
   cursor: pointer !important;
+}
+
+body.custom-cursor-active .cursor-default {
+  cursor: default !important;
 }
 
 @keyframes wwo-cloud-drift-a {
