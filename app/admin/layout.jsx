@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart } from "lucide-react";
+import LogoutButton from "../components/LogoutButton"; // Make sure this file exists!
 
 export default function AdminLayout({ children }) {
   return (
     <div className="min-h-screen bg-zinc-950 flex text-zinc-50">
-      {/* Sidebar */}
+      {/* --- Desktop Sidebar --- */}
       <aside className="w-64 bg-zinc-900 border-r border-zinc-800 hidden md:flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-zinc-800">
           <span className="text-lg font-bold tracking-wider text-purple-400">SHIV SHAKKTI</span>
@@ -16,7 +17,8 @@ export default function AdminLayout({ children }) {
             <LayoutDashboard className="w-5 h-5 mr-3" />
             Dashboard
           </Link>
-          <Link href="/manage-products" className="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors">
+          {/* Fixed the href path here to point to /admin/manage-products */}
+          <Link href="/admin/manage-products" className="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors">
             <Package className="w-5 h-5 mr-3" />
             Products
           </Link>
@@ -26,20 +28,22 @@ export default function AdminLayout({ children }) {
           </Link>
         </nav>
 
+        {/* Desktop Logout Button */}
         <div className="p-4 border-t border-zinc-800">
-          <button className="flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors">
-            <LogOut className="w-5 h-5 mr-3" />
-            Sign Out
-          </button>
+           <LogoutButton /> 
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* --- Main Content Area --- */}
       <div className="flex-1 flex flex-col">
-        {/* Mobile Header (Hidden on Desktop) */}
+        
+        {/* Mobile Header (Visible only on small screens) */}
         <header className="h-16 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between px-6 md:hidden">
           <span className="font-bold text-purple-400">ADMIN</span>
-          {/* Add a mobile menu sheet trigger here if needed */}
+          {/* Mobile Logout Button inserted here so it's always accessible */}
+          <div className="w-auto">
+            <LogoutButton />
+          </div>
         </header>
 
         <main className="flex-1 p-6 lg:p-10 overflow-auto">

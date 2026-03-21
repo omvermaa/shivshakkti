@@ -1,6 +1,6 @@
 import { Cinzel_Decorative } from 'next/font/google';
 import "./globals.css";
-
+import { Providers } from "./components/Providers";
 
 // Configure the font
 const cinzel = Cinzel_Decorative({ 
@@ -14,7 +14,9 @@ export default function RootLayout({ children }) {
     // Apply the font variable to the HTML body
     <html lang="en" className={cinzel.variable}>
       <body className="bg-[#1a1a1a] text-white">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

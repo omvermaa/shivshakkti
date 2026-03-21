@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useSession, signOut } from "next-auth/react";
 
 const navLinks = [
   { name: 'Home', href: '/' },
@@ -13,7 +14,7 @@ const navLinks = [
   { name: 'Contact', href: '/contact' },
 ];
 
-const FullScreenMenu = ({ closeMenu }) => (
+const FullScreenMenu = ({ closeMenu, session }) => (
   <motion.div 
     initial={{ y: "-100%" }}
     animate={{ y: 0 }}
@@ -43,6 +44,27 @@ const FullScreenMenu = ({ closeMenu }) => (
           {link.name}
         </Link>
       ))}
+      
+      {/* Mobile Auth Button Swap */}
+      {session ? (
+        <button
+          onClick={() => {
+            signOut({ callbackUrl: '/' });
+            closeMenu();
+          }}
+          className="text-2xl tracking-[0.15em] text-rose-400 uppercase transition-colors hover:text-rose-300"
+        >
+          Logout
+        </button>
+      ) : (
+        <Link
+          href="/user-login"
+          onClick={closeMenu}
+          className="text-2xl tracking-[0.15em] text-purple-400 uppercase transition-colors hover:text-purple-300"
+        >
+          Login
+        </Link>
+      )}
     </nav>
   </motion.div>
 );
@@ -51,6 +73,8 @@ export default function Navigation({ onClose }) {
   const pathname = usePathname();
   const isShopRoute = pathname?.startsWith('/shop');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const { data: session } = useSession();
 
   if (isShopRoute) {
     return (
@@ -62,8 +86,7 @@ export default function Navigation({ onClose }) {
               ShivShakkti
             </Link>
             
-            {/* Desktop Links */}
-            <nav className="hidden md:flex gap-8">
+            <nav className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
@@ -73,6 +96,23 @@ export default function Navigation({ onClose }) {
                   {link.name}
                 </Link>
               ))}
+              
+              {/* Desktop Auth Button Swap */}
+              {session ? (
+                <button
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="text-sm tracking-widest text-rose-400 uppercase transition-colors hover:text-rose-300"
+                >
+                  LOGOUT
+                </button>
+              ) : (
+                <Link
+                  href="/user-login"
+                  className="text-sm tracking-widest text-purple-400 uppercase transition-colors hover:text-purple-300"
+                >
+                  LOGIN
+                </Link>
+              )}
             </nav>
 
             {/* Mobile Menu Button */}
@@ -93,7 +133,10 @@ export default function Navigation({ onClose }) {
         {/* Mobile Full Screen Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <FullScreenMenu closeMenu={() => setMobileMenuOpen(false)} />
+            <FullScreenMenu 
+              closeMenu={() => setMobileMenuOpen(false)} 
+              session={session} 
+            />
           )}
         </AnimatePresence>
       </>
@@ -101,5 +144,5 @@ export default function Navigation({ onClose }) {
   }
 
   // Original Full Screen Menu for Landing Page
-  return <FullScreenMenu closeMenu={onClose} />;
+  return <FullScreenMenu closeMenu={onClose} session={session} />;
 }

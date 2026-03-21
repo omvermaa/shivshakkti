@@ -19,6 +19,18 @@ export default function ShopPage({ searchParams }) {
     <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-12 px-6 lg:px-12">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
         
+        {/* Mobile Search Bar */}
+        <div className="flex md:hidden flex-col sm:flex-row gap-4">
+          <Input 
+            type="text" 
+            placeholder="Search for mystical items..." 
+            className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-purple-500/50"
+          />
+          <Button className="bg-purple-600 hover:bg-purple-700 text-white shrink-0">
+            Search
+          </Button>
+        </div>
+
         {/* Sidebar Filters */}
         <aside className="w-full md:w-64 flex-shrink-0 space-y-8">
           <div>
@@ -53,8 +65,8 @@ export default function ShopPage({ searchParams }) {
 
         {/* Main Content */}
         <main className="flex-1">
-          {/* Search Bar */}
-          <div className="mb-8 flex flex-col sm:flex-row gap-4">
+          {/* Desktop Search Bar */}
+          <div className="hidden md:flex mb-8 flex-col sm:flex-row gap-4">
             <Input 
               type="text" 
               placeholder="Search for mystical items..." 
