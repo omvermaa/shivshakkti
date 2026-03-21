@@ -273,7 +273,7 @@ export const Index = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.4, duration: 0.8, ease: brandEase }}
             >
-              <button className="btn-ritual">Shop Online</button>
+              <button onClick={() => router.push('/shop')} className="btn-ritual">Shop Online</button>
               <button className="btn-ritual">Visit Store</button>
             </motion.div>
           </motion.div>
