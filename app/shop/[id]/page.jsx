@@ -1,7 +1,6 @@
-
-"use client"
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
@@ -14,36 +13,39 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../../components/ui/carousel";
-import crystal from "../../assets/Amethyst Crystal Cluster.webp"
 
-// Mock database for all products
-const allProducts = [
-  {
-    id: "1",
-    name: "Amethyst Crystal Cluster",
-    price: 1200,
-    category: "Crystals",
-    description: "This stunning Amethyst crystal cluster radiates calming energy. Perfect for your meditation altar or as a protective piece for your living space. Sourced ethically and cleansed under the full moon.",
-    stock: 5,
-    image: crystal
-  },
-  { id: "2", name: "The Rider-Waite Tarot Deck", price: 850, category: "Tarot Decks", image: "https://images.unsplash.com/photo-1633421118129-87d2511470ce?auto=format&fit=crop&q=80&w=500" },
-  { id: "3", name: "Clear Quartz Pendulum", price: 450, category: "Pendulums", image: "https://images.unsplash.com/photo-1597931350692-0b13503a46fb?auto=format&fit=crop&q=80&w=500" },
-  { id: "4", name: "Sage Smudge Stick", price: 250, category: "Incense", image: "https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?auto=format&fit=crop&q=80&w=500" },
-  { id: "5", name: "Rose Quartz Heart", price: 600, category: "Crystals", image: "https://images.unsplash.com/photo-1602173574767-37ac01994b4a?auto=format&fit=crop&q=80&w=500" },
-  { id: "6", name: "Citrine Raw Point", price: 900, category: "Crystals", image: "https://images.unsplash.com/photo-1597931350692-0b13503a46fb?auto=format&fit=crop&q=80&w=500" }
-];
+// Import Database connection and Product model
+import { connectMongoDB } from "../../lib/mongodb";
+import Product from "../../models/Product";
 
-export default function ProductPage({ params }) {
-  const currentId = params?.id || "1";
-  
-  // 1. Fetch the product using the ID from params
-  const product = allProducts.find(p => p.id === currentId) || allProducts[0];
+export default async function ProductPage({ params }) {
+  // 1. Await the params object (Required in Next.js 15+)
+  const { id } = await params;
 
-  // 2. Automatically find related products dynamically
-  const relatedProducts = allProducts
-    .filter(p => p.category === product.category && p.id !== product.id)
-    .slice(0, 4); // Limit to 4 related products
+  // 2. Connect to the database
+  await connectMongoDB();
+
+  // 3. Fetch the specific product using the ID from the URL
+  let product;
+  try {
+    product = await Product.findById(id).lean();
+  } catch (error) {
+    // If the ID format is invalid, Mongoose throws an error. Catch it and show 404.
+    return notFound();
+  }
+
+  // If no product is found in the database, trigger the 404 page
+  if (!product) {
+    return notFound();
+  }
+
+  // 4. Fetch Dynamic Related Products (Same category, excluding the current product)
+  const relatedProducts = await Product.find({
+    category: product.category,
+    _id: { $ne: product._id } // Do not show the current product in the recommendations
+  })
+    .limit(5)
+    .lean();
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-20 px-6 lg:px-12">
@@ -58,7 +60,7 @@ export default function ProductPage({ params }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 mb-24">
           <div className="aspect-square relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800">
             <Image 
-              src={product.image}
+              src={product.images?.[0] || "/placeholder-image.jpg"}
               alt={product.name}
               fill
               className="object-cover"
@@ -82,7 +84,7 @@ export default function ProductPage({ params }) {
             <Separator className="bg-zinc-800 mb-6" />
 
             <div className="prose prose-invert mb-8">
-              <p className="text-zinc-300 leading-relaxed">
+              <p className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
                 {product.description}
               </p>
             </div>
@@ -116,50 +118,51 @@ export default function ProductPage({ params }) {
           </div>
         </div>
 
-        {/* --- You May Also Like Section (Manual Carousel) --- */}
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight text-zinc-100 mb-8">You May Also Like</h2>
-          
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-4">
-              {relatedProducts.map((item) => (
-                <CarouselItem key={item.id} className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-                  <Link href={`/shop/${item.id}`} className="group block h-full">
-                    <Card className="bg-zinc-900 border-zinc-800 overflow-hidden hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
-                      <div className="aspect-square relative overflow-hidden bg-zinc-800 flex-shrink-0">
-                        <Image 
-                          src={item.image} 
-                          alt={item.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                      <CardContent className="p-5 flex flex-col flex-grow justify-between">
-                        <div>
-                          <Badge variant="outline" className="text-zinc-400 border-zinc-700 mb-3 text-xs">
-                            {item.category}
-                          </Badge>
-                          <h3 className="font-medium text-zinc-100 mb-1 line-clamp-1">{item.name}</h3>
-                        </div>
-                        <p className="text-purple-400 font-semibold mt-2">₹{item.price}</p>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
+        {/* --- Dynamic You May Also Like Section --- */}
+        {relatedProducts.length > 0 && (
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-zinc-100 mb-8">You May Also Like</h2>
             
-            {/* Navigation buttons: hidden on very small screens, visible on hover/sm+ */}
-            <CarouselPrevious className="hidden sm:flex -left-4 md:-left-12 border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 hover:border-purple-500/50 transition-all" />
-            <CarouselNext className="hidden sm:flex -right-4 md:-right-12 border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 hover:border-purple-500/50 transition-all" />
-          </Carousel>
-        </div>
+            <Carousel
+              opts={{
+                align: "start",
+                loop: false, // Turned off looping in case there are only 1-2 related items
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-4">
+                {relatedProducts.map((item) => (
+                  <CarouselItem key={item._id.toString()} className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                    <Link href={`/shop/${item._id.toString()}`} className="group block h-full">
+                      <Card className="bg-zinc-900 border-zinc-800 overflow-hidden hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
+                        <div className="aspect-square relative overflow-hidden bg-zinc-800 flex-shrink-0">
+                          <Image 
+                            src={item.images?.[0] || "/placeholder-image.jpg"} 
+                            alt={item.name}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                        <CardContent className="p-5 flex flex-col flex-grow justify-between">
+                          <div>
+                            <Badge variant="outline" className="text-zinc-400 border-zinc-700 mb-3 text-xs">
+                              {item.category}
+                            </Badge>
+                            <h3 className="font-medium text-zinc-100 mb-1 line-clamp-1">{item.name}</h3>
+                          </div>
+                          <p className="text-purple-400 font-semibold mt-2">₹{item.price}</p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              
+              <CarouselPrevious className="hidden sm:flex -left-4 md:-left-12 border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 hover:border-purple-500/50 transition-all" />
+              <CarouselNext className="hidden sm:flex -right-4 md:-right-12 border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 hover:border-purple-500/50 transition-all" />
+            </Carousel>
+          </div>
+        )}
 
       </div>
     </div>
