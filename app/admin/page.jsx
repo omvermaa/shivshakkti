@@ -1,7 +1,12 @@
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
 import { IndianRupee, ShoppingBag, PackageOpen } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 const recentOrders = [
   { id: "ORD-001", customer: "Aanya Sharma", amount: 1200, status: "Paid", date: "Today" },
@@ -9,7 +14,13 @@ const recentOrders = [
   { id: "ORD-003", customer: "Priya Patel", amount: 2450, status: "Paid", date: "Mar 18" },
 ];
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  // --- ADDED SECURITY CHECK ---
+  const session = await getServerSession(authOptions);
+  if (!session || session?.user?.role !== "admin") {
+    redirect("/admin-login");
+  }
+
   return (
     <div className="space-y-8">
       <div>

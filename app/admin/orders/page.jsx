@@ -1,7 +1,18 @@
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { getAdminOrders } from "../../actions/order";
 import OrderManager from "./OrderManager";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminOrdersPage() {
+  // --- ADDED SECURITY CHECK ---
+  const session = await getServerSession(authOptions);
+  if (!session || session?.user?.role !== "admin") {
+    redirect("/admin-login");
+  }
+
   // Fetch live order data directly from MongoDB
   const orders = await getAdminOrders();
 

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminMessagesPage() {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "admin") redirect("/admin-login");
+  if (!session || session?.user?.role !== "admin") redirect("/admin-login");
 
   const messages = await getMessages();
 

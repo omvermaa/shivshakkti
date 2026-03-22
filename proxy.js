@@ -9,9 +9,21 @@ export default withAuth(
     const token = req.nextauth.token;
     const userRole = token?.role;
 
-    // 1. Prevent admins from seeing login pages (send them straight to dashboard)
+    // 1. Handle Unauthenticated Users
+    if (!token) {
+      if (path.startsWith("/admin") && path !== "/admin-login") {
+        return NextResponse.redirect(new URL("/admin-login", req.url));
+      }
+      if (path === "/profile" || path === "/orders") {
+        return NextResponse.redirect(new URL("/user-login", req.url));
+      }
+      // Allow access to login pages and unauthorized page for unauthenticated users
+      return NextResponse.next();
+    }
+
+    // 2. Prevent admins from seeing login pages (send them straight to dashboard)
     //    Prevent users from seeing the user-login page (send them to shop)
-    if (path === "/user-login" && token) {
+    if (path === "/user-login") {
       return NextResponse.redirect(new URL(userRole === "admin" ? "/admin" : "/shop", req.url));
     }
     
@@ -21,7 +33,7 @@ export default withAuth(
       return NextResponse.redirect(new URL("/admin", req.url));
     }
 
-    // 2. Protect Admin Routes
+    // 3. Protect Admin Routes
     const isAdminRoute = path.startsWith("/admin") && path !== "/admin-login";
 
     if (isAdminRoute && userRole !== "admin") {
@@ -33,18 +45,13 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ req, token }) => {
-        const path = req.nextUrl.pathname;
-        // Always allow access to login pages AND the unauthorized page
-        if (path === "/user-login" || path === "/admin-login" || path === "/unauthorized") return true;
-        
-        return !!token;
-      },
+      // Return true to allow the proxy function above to handle all routing logic
+      authorized: () => true,
     },
   }
 );
 
 export const config = {
   // Added /profile and /orders to the protection array!
-  matcher: ["/admin/:path*", "/user-login", "/admin-login", "/unauthorized", "/profile", "/orders"],
+  matcher: ["/admin/:path*", "/user-login", "/admin", "/admin-login", "/unauthorized", "/profile", "/orders"],
 };

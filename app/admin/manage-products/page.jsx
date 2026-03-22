@@ -1,7 +1,18 @@
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { getProducts } from "../../actions/product";
 import ProductManager from "./ProductManager";
 
+export const dynamic = "force-dynamic";
+
 export default async function ManageProductsPage() {
+  // --- ADDED SECURITY CHECK ---
+  const session = await getServerSession(authOptions);
+  if (!session || session?.user?.role !== "admin") {
+    redirect("/admin-login");
+  }
+
   // Fetch live data directly from MongoDB before the page loads
   const products = await getProducts();
 
