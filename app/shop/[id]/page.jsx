@@ -49,7 +49,7 @@ export default async function ProductPage({ params }) {
     .lean();
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-20 px-6 lg:px-12">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-32 pb-20 px-6 lg:px-12">
       <div className="max-w-6xl mx-auto">
         
         <Link href="/shop" className="inline-flex items-center text-sm text-zinc-400 hover:text-purple-400 mb-8 transition-colors">

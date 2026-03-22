@@ -21,7 +21,7 @@ export default function AddToCart({ productId, stock }) {
     const result = await addToCart(productId, quantity);
 
     if (result.success) {
-      alert("Added to cart successfully!");
+      // alert("Added to cart successfully!");
       router.refresh(); // Refreshes the server state
     } else if (result.error === "unauthorized") {
       alert("Please log in to add items to your cart.");

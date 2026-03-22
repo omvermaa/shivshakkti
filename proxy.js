@@ -45,5 +45,6 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/admin/:path*", "/user-login", "/admin-login", "/unauthorized"],
+  // Added /profile and /orders to the protection array!
+  matcher: ["/admin/:path*", "/user-login", "/admin-login", "/unauthorized", "/profile", "/orders"],
 };

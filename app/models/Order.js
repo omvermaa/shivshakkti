@@ -18,8 +18,7 @@ const orderSchema = new Schema(
     ],
     totalAmount: { type: Number, required: true },
     paymentMethod: { type: String, enum: ["COD", "Prepaid"], required: true },
-    paymentStatus: { type: String, enum: ["Pending", "Paid", "Failed"], default: "Pending" },
-    deliveryStatus: { type: String, enum: ["Pending", "Shipped", "Delivered"], default: "Pending" },
+    deliveryStatus: { type: String, enum: ["Received", "Shipped", "Delivered"], default: "Received" },
     razorpayOrderId: { type: String }, // For Prepaid orders
     razorpayPaymentId: { type: String }, // For Prepaid orders
   },
