@@ -1,169 +1,11 @@
-// import Link from "next/link";
-// import Image from "next/image";
-// import { Input } from "../components/ui/input";
-// import { Button } from "../components/ui/button";
-// import { Card, CardContent } from "../components/ui/card";
-// import { Slider } from "../components/ui/slider";
-// import { Badge } from "../components/ui/badge";
-
-// // Import your database utilities
-// import { connectMongoDB } from "../lib/mongodb";
-// import Product from "../models/Product";
-
-// // FORCE DYNAMIC: Tells Next.js NOT to cache this page so the filters work instantly!
-// export const dynamic = "force-dynamic";
-
-// export default async function ShopPage({ searchParams }) {
-//   // 1. Connect to the database
-//   await connectMongoDB();
-
-//   // 2. Next.js 15+ Strictly Requires awaiting searchParams
-//   const params = await searchParams;
-  
-//   // Get current category, fallback to 'all' if none is selected
-//   const currentCategory = params.category ? decodeURIComponent(params.category) : 'all';
-
-//   // 3. Build the dynamic search query
-//   const query = {};
-
-//   // Text Search Filter
-//   if (params.q) {
-//     query.name = { $regex: params.q, $options: "i" }; // Case-insensitive search
-//   }
-
-//   // Category Filter (This makes the buttons work!)
-//   if (currentCategory !== 'all') {
-//     const categoryMap = {
-//       'tarot decks': 'Tarot Decks',
-//       'crystals': 'Crystals',
-//       'pendulums': 'Pendulums',
-//       'incense': 'Incense',
-//       'jewelry': 'Jewelry',
-//       'other': 'Other'
-//     };
-    
-//     // Map the URL slug back to the exact format stored in your MongoDB database
-//     query.category = categoryMap[currentCategory.toLowerCase()] || currentCategory;
-//   }
-
-//   // Price Filter 
-//   if (params.maxPrice) {
-//     query.price = { $lte: Number(params.maxPrice) };
-//   }
-
-//   // 4. Fetch the filtered products from MongoDB
-//   const products = await Product.find(query).lean();
-
-//   // Array of categories to map over
-//   const categories = ['All', 'Tarot Decks', 'Crystals', 'Pendulums', 'Incense', 'Jewelry'];
-
-//   return (
-//     <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-12 px-6 lg:px-12">
-//       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
-        
-//         {/* Sidebar Filters */}
-//         <aside className="w-full md:w-64 flex-shrink-0 space-y-8">
-//           <div>
-//             <h2 className="text-lg font-semibold tracking-wide text-zinc-100 mb-4">Categories</h2>
-//             <div className="flex flex-wrap gap-2">
-//               {categories.map((cat) => {
-//                 // Check if this specific button is the active one
-//                 const isActive = (cat === 'All' && currentCategory === 'all') || 
-//                                  (currentCategory.toLowerCase() === cat.toLowerCase());
-                
-//                 return (
-//                   <Link 
-//                     key={cat} 
-//                     href={cat === 'All' ? '/shop' : `/shop?category=${cat.toLowerCase()}`}
-//                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${
-//                       isActive
-//                         ? "bg-purple-600 text-white border-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.2)]"
-//                         : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:bg-zinc-800 hover:text-zinc-200 hover:border-zinc-700"
-//                     }`}
-//                   >
-//                     {cat}
-//                   </Link>
-//                 );
-//               })}
-//             </div>
-//           </div>
-
-//           <div>
-//             <h2 className="text-lg font-semibold tracking-wide text-zinc-100 mb-4">Max Price (₹)</h2>
-//             <Slider 
-//               defaultValue={[5000]} 
-//               max={10000} 
-//               step={100} 
-//               className="mb-2"
-//             />
-//             <div className="flex justify-between text-xs text-zinc-500">
-//               <span>₹0</span>
-//               <span>₹10000</span>
-//             </div>
-//           </div>
-//         </aside>
-
-//         {/* Main Content */}
-//         <main className="flex-1">
-//           {/* Search Bar */}
-//           <div className="mb-8 flex flex-col sm:flex-row gap-4">
-//             <Input 
-//               type="text" 
-//               defaultValue={params.q || ""}
-//               placeholder="Search for mystical items..." 
-//               className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-purple-500/50"
-//             />
-//             <Button className="bg-purple-600 hover:bg-purple-700 text-white shrink-0">
-//               Search
-//             </Button>
-//           </div>
-
-//           {/* Real Product Grid */}
-//           {products.length === 0 ? (
-//             <div className="text-center py-20 text-zinc-500 border border-dashed border-zinc-800 rounded-xl bg-zinc-900/30">
-//               <p>No mystical items found matching your criteria.</p>
-//             </div>
-//           ) : (
-//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-//               {products.map((product) => (
-//                 <Link href={`/shop/${product._id.toString()}`} key={product._id.toString()} className="group cursor-pointer">
-//                   <Card className="bg-zinc-900 border-zinc-800 overflow-hidden hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
-//                     <div className="aspect-square relative overflow-hidden bg-zinc-800 flex-shrink-0">
-//                       <Image 
-//                         src={product.images?.[0] || "/placeholder-image.jpg"} 
-//                         alt={product.name}
-//                         fill
-//                         className="object-cover group-hover:scale-105 transition-transform duration-500"
-//                         unoptimized
-//                       />
-//                     </div>
-//                     <CardContent className="p-5 flex flex-col flex-grow justify-between">
-//                       <div>
-//                         <Badge variant="outline" className="text-zinc-400 border-zinc-700 mb-3 text-xs">
-//                           {product.category}
-//                         </Badge>
-//                         <h3 className="font-medium text-zinc-100 mb-1 line-clamp-1">{product.name}</h3>
-//                       </div>
-//                       <p className="text-purple-400 font-semibold mt-2">₹{product.price}</p>
-//                     </CardContent>
-//                   </Card>
-//                 </Link>
-//               ))}
-//             </div>
-//           )}
-//         </main>
-//       </div>
-//     </div>
-//   );
-// }
-
 import Link from "next/link";
 import Image from "next/image";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
-import PriceFilter from "../components/PriceFilter"; // <-- Import the new filter!
+import PriceFilter from "../components/PriceFilter"; 
+import ProductCardCarousel from "../components/ProductCardCarousel";// <-- Import the new filter!
 
 // Import your database utilities
 import { connectMongoDB } from "../lib/mongodb";
@@ -269,7 +111,7 @@ export default async function ShopPage({ searchParams }) {
             </Button>
           </form>
 
-          {/* Product Grid */}
+          {/* Real Product Grid */}
           {products.length === 0 ? (
             <div className="text-center py-20 text-zinc-500 border border-dashed border-zinc-800 rounded-xl bg-zinc-900/30">
               <p>No mystical items found matching your criteria.</p>
@@ -279,15 +121,12 @@ export default async function ShopPage({ searchParams }) {
               {products.map((product) => (
                 <Link href={`/shop/${product._id.toString()}`} key={product._id.toString()} className="group cursor-pointer">
                   <Card className="bg-zinc-900 border-zinc-800 overflow-hidden hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
+                    
+                    {/* --- REPLACED STATIC IMAGE WITH CAROUSEL --- */}
                     <div className="aspect-square relative overflow-hidden bg-zinc-800 flex-shrink-0">
-                      <Image 
-                        src={product.images?.[0] || "/placeholder-image.jpg"} 
-                        alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        unoptimized
-                      />
+                      <ProductCardCarousel images={product.images} alt={product.name} />
                     </div>
+
                     <CardContent className="p-5 flex flex-col flex-grow justify-between">
                       <div>
                         <Badge variant="outline" className="text-zinc-400 border-zinc-700 mb-3 text-xs">

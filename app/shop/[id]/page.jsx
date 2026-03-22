@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-// --- UPDATED IMPORT ---
+// --- FIXED IMPORT: Use the correct component with thumbnails! ---
 import ProductImageCarousel from "../../components/ProductImageCarousel";
 import { connectMongoDB } from "../../lib/mongodb";
 import Product from "../../models/Product";
-import AddToCart from "../../components/AddToCart"; // assuming this exists
+import AddToCart from "../../components/AddToCart"; 
 import { Separator } from "../../components/ui/separator";
 import { Badge } from "../../components/ui/badge";
 import { Truck, ShieldCheck, Tag } from "lucide-react";
@@ -44,7 +44,7 @@ export default async function ProductPage({ params }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
           
-          {/* --- LEFT COLUMN: New Carousel --- */}
+          {/* --- LEFT COLUMN: Large Carousel with Thumbnails --- */}
           <div>
             <ProductImageCarousel images={images} name={product.name} />
           </div>
@@ -74,7 +74,8 @@ export default async function ProductPage({ params }) {
                 )}
               </div>
               
-              <AddToCart product={JSON.parse(JSON.stringify(product))} />
+              {/* FIXED: Passing the correct props to AddToCart */}
+              <AddToCart productId={product._id.toString()} stock={product.stock} />
             </div>
 
             <Separator className="bg-zinc-800" />
