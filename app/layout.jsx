@@ -1,32 +1,8 @@
-// import { Cinzel_Decorative } from 'next/font/google';
-// import "./globals.css";
-// import { Providers } from "./components/Providers";
-// import Navigation from './components/Navigation';
-
-// // Configure the font
-// const cinzel = Cinzel_Decorative({ 
-//   weight: ['400', '700'], 
-//   subsets: ['latin'],
-//   variable: '--font-cinzel', // This allows us to use it in Tailwind
-// });
-
-// export default function RootLayout({ children }) {
-//   return (
-//     // Apply the font variable to the HTML body
-//     <html lang="en" className={cinzel.variable}>
-//       <body className="bg-[#1a1a1a] text-white">
-//         <Providers>
-//           {children}
-//         </Providers>
-//       </body>
-//     </html>
-//   );
-// }
-
 import { Cinzel_Decorative } from 'next/font/google';
 import "./globals.css";
 import { Providers } from "./components/Providers";
-import Navigation from "./components/Navigation"; // <-- Import it here!
+import Navigation from "./components/Navigation"; 
+import Footer from "./components/Footer"; // <-- 1. Import Footer
 
 const cinzel = Cinzel_Decorative({ 
   weight: ['400', '700'], 
@@ -37,11 +13,16 @@ const cinzel = Cinzel_Decorative({
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={cinzel.variable}>
-      <body className="bg-zinc-950 text-white">
+      <body className="bg-zinc-950 text-white min-h-screen flex flex-col">
         <Providers>
-          {/* Add Navigation above children so it appears on all pages */}
           <Navigation />
-          {children}
+          
+          {/* 2. Make main flex-grow so footer stays at the bottom on short pages */}
+          <main className="flex-grow">
+            {children}
+          </main>
+
+          <Footer /> {/* <-- 3. Add Footer here */}
         </Providers>
       </body>
     </html>

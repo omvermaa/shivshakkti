@@ -5,9 +5,8 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import PriceFilter from "../components/PriceFilter"; 
-import ProductCardCarousel from "../components/ProductCardCarousel";// <-- Import the new filter!
+import ProductCardCarousel from "../components/ProductCardCarousel"; // <-- IMPORTED HERE!
 
-// Import your database utilities
 import { connectMongoDB } from "../lib/mongodb";
 import Product from "../models/Product";
 
@@ -19,17 +18,14 @@ export default async function ShopPage({ searchParams }) {
   const params = await searchParams;
   
   const currentCategory = params.category ? decodeURIComponent(params.category) : 'all';
-  // Default the price slider to 10,000 if not set in the URL
   const currentMaxPrice = params.maxPrice ? Number(params.maxPrice) : 5000; 
 
   const query = {};
 
-  // Text Search Filter
   if (params.q) {
     query.name = { $regex: params.q, $options: "i" };
   }
 
-  // Category Filter
   if (currentCategory !== 'all') {
     const categoryMap = {
       'tarot decks': 'Tarot Decks',
@@ -42,7 +38,6 @@ export default async function ShopPage({ searchParams }) {
     query.category = categoryMap[currentCategory.toLowerCase()] || currentCategory;
   }
 
-  // Price Filter (This receives the update from our new component!)
   if (params.maxPrice) {
     query.price = { $lte: currentMaxPrice };
   }
@@ -63,7 +58,6 @@ export default async function ShopPage({ searchParams }) {
                 const isActive = (cat === 'All' && currentCategory === 'all') || 
                                  (currentCategory.toLowerCase() === cat.toLowerCase());
                 
-                // Preserve the maxPrice parameter when switching categories!
                 const targetUrl = cat === 'All' 
                   ? `/shop?maxPrice=${currentMaxPrice}` 
                   : `/shop?category=${cat.toLowerCase()}&maxPrice=${currentMaxPrice}`;
@@ -85,17 +79,12 @@ export default async function ShopPage({ searchParams }) {
             </div>
           </div>
 
-          {/* New Interactive Price Filter Component */}
           <PriceFilter initialPrice={currentMaxPrice} />
-          
         </aside>
 
         {/* Main Content */}
         <main className="flex-1">
-          
-          {/* Working Search Form */}
           <form action="/shop" method="GET" className="mb-8 flex flex-col sm:flex-row gap-4">
-            {/* These hidden inputs ensure we don't lose the category/price filters when searching! */}
             {currentCategory !== 'all' && <input type="hidden" name="category" value={currentCategory} />}
             <input type="hidden" name="maxPrice" value={currentMaxPrice} />
             
@@ -111,7 +100,6 @@ export default async function ShopPage({ searchParams }) {
             </Button>
           </form>
 
-          {/* Real Product Grid */}
           {products.length === 0 ? (
             <div className="text-center py-20 text-zinc-500 border border-dashed border-zinc-800 rounded-xl bg-zinc-900/30">
               <p>No mystical items found matching your criteria.</p>
@@ -122,7 +110,7 @@ export default async function ShopPage({ searchParams }) {
                 <Link href={`/shop/${product._id.toString()}`} key={product._id.toString()} className="group cursor-pointer">
                   <Card className="bg-zinc-900 border-zinc-800 overflow-hidden hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
                     
-                    {/* --- REPLACED STATIC IMAGE WITH CAROUSEL --- */}
+                    {/* --- THE FIX: Mini Carousel mapped inside the Grid --- */}
                     <div className="aspect-square relative overflow-hidden bg-zinc-800 flex-shrink-0">
                       <ProductCardCarousel images={product.images} alt={product.name} />
                     </div>

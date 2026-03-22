@@ -61,8 +61,8 @@ export default function ProductManager({ initialProducts }) {
     formData.append("file", file);
     
     // ⚠️ REPLACE THESE WITH YOUR CLOUDINARY DETAILS ⚠️
-    formData.append("upload_preset", "YOUR_UPLOAD_PRESET"); 
-    const cloudName = "YOUR_CLOUD_NAME"; 
+    formData.append("upload_preset", "shivshakkti_preset"); 
+    const cloudName = "dxgvwi4uu"; 
 
     const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
       method: "POST",

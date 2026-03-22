@@ -9,7 +9,7 @@ export default function ProductCardCarousel({ images, alt }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // We use e.preventDefault() to stop the <Link> wrapping the card from triggering when we just want to click the arrow!
+  // e.preventDefault() stops the wrapping <Link> from redirecting you when clicking arrows!
   const scrollPrev = useCallback((e) => { e.preventDefault(); e.stopPropagation(); emblaApi?.scrollPrev(); }, [emblaApi]);
   const scrollNext = useCallback((e) => { e.preventDefault(); e.stopPropagation(); emblaApi?.scrollNext(); }, [emblaApi]);
 

@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
-// --- FIXED IMPORT: Use the correct component with thumbnails! ---
-import ProductImageCarousel from "../../components/ProductImageCarousel";
+import ProductImageCarousel from "../../components/ProductImageCarousel"; // <-- Large Carousel
 import { connectMongoDB } from "../../lib/mongodb";
 import Product from "../../models/Product";
 import AddToCart from "../../components/AddToCart"; 
@@ -14,26 +12,22 @@ export default async function ProductPage({ params }) {
   await connectMongoDB();
 
   const resolvedParams = await params;
-  
   const product = await Product.findById(resolvedParams.id).lean();
 
   if (!product) {
     notFound();
   }
 
-  // Double-check images is an array, fallback to placeholder if empty
   const images = Array.isArray(product.images) && product.images.length > 0
     ? product.images
     : ["/placeholder-product.jpg"];
 
-  // Format description into paragraphs based on newlines
   const descriptionParagraphs = product.description.split('\n').filter(p => p.trim());
 
   return (
     <div className="min-h-screen bg-zinc-950 pt-28 pb-16 px-6 lg:px-12 text-zinc-50 font-sans">
       <div className="max-w-7xl mx-auto">
         
-        {/* Breadcrumb */}
         <div className="text-sm text-zinc-500 mb-8 tracking-wide">
           <Link href="/shop" className="hover:text-purple-400">Shop Now</Link>
           <span className="mx-2">/</span>
@@ -44,12 +38,11 @@ export default async function ProductPage({ params }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
           
-          {/* --- LEFT COLUMN: Large Carousel with Thumbnails --- */}
+          {/* --- THE FIX: Large Thumbnail Carousel Rendered Here --- */}
           <div>
             <ProductImageCarousel images={images} name={product.name} />
           </div>
 
-          {/* RIGHT COLUMN: Product Details */}
           <div className="space-y-8">
             <div className="space-y-3">
               <Badge variant="outline" className="text-purple-400 border-purple-900/50 bg-purple-950/30 px-3 py-1 text-xs">
@@ -74,13 +67,11 @@ export default async function ProductPage({ params }) {
                 )}
               </div>
               
-              {/* FIXED: Passing the correct props to AddToCart */}
               <AddToCart productId={product._id.toString()} stock={product.stock} />
             </div>
 
             <Separator className="bg-zinc-800" />
 
-            {/* Description */}
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-zinc-100 tracking-tight">Product Details</h3>
               <div className="prose prose-zinc prose-invert prose-sm text-zinc-300 leading-relaxed max-w-none">
@@ -90,7 +81,6 @@ export default async function ProductPage({ params }) {
               </div>
             </div>
 
-            {/* Trust Badges */}
             <div className="pt-6 grid grid-cols-2 gap-4">
                <div className="flex items-start gap-3 p-4 bg-zinc-900 border border-zinc-800 rounded-lg">
                   <Truck className="w-8 h-8 text-purple-500 shrink-0" />
