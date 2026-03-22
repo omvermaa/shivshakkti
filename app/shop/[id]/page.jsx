@@ -1,175 +1,114 @@
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Button } from "../../components/ui/button";
-import { Badge } from "../../components/ui/badge";
-import { Separator } from "../../components/ui/separator";
-import { Card, CardContent } from "../../components/ui/card";
-import { ArrowLeft, ShoppingBag } from "lucide-react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "../../components/ui/carousel";
-
-// Import Database connection and Product model
+// --- UPDATED IMPORT ---
+import ProductImageCarousel from "../../components/ProductImageCarousel";
 import { connectMongoDB } from "../../lib/mongodb";
 import Product from "../../models/Product";
-import AddToCart from "../../components/AddToCart";
+import AddToCart from "../../components/AddToCart"; // assuming this exists
+import { Separator } from "../../components/ui/separator";
+import { Badge } from "../../components/ui/badge";
+import { Truck, ShieldCheck, Tag } from "lucide-react";
 
 export default async function ProductPage({ params }) {
-  // 1. Await the params object (Required in Next.js 15+)
-  const { id } = await params;
-
-  // 2. Connect to the database
   await connectMongoDB();
 
-  // 3. Fetch the specific product using the ID from the URL
-  let product;
-  try {
-    product = await Product.findById(id).lean();
-  } catch (error) {
-    // If the ID format is invalid, Mongoose throws an error. Catch it and show 404.
-    return notFound();
-  }
+  const resolvedParams = await params;
+  
+  const product = await Product.findById(resolvedParams.id).lean();
 
-  // If no product is found in the database, trigger the 404 page
   if (!product) {
-    return notFound();
+    notFound();
   }
 
-  // 4. Fetch Dynamic Related Products (Same category, excluding the current product)
-  const relatedProducts = await Product.find({
-    category: product.category,
-    _id: { $ne: product._id } // Do not show the current product in the recommendations
-  })
-    .limit(5)
-    .lean();
+  // Double-check images is an array, fallback to placeholder if empty
+  const images = Array.isArray(product.images) && product.images.length > 0
+    ? product.images
+    : ["/placeholder-product.jpg"];
+
+  // Format description into paragraphs based on newlines
+  const descriptionParagraphs = product.description.split('\n').filter(p => p.trim());
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-32 pb-20 px-6 lg:px-12">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-zinc-950 pt-28 pb-16 px-6 lg:px-12 text-zinc-50 font-sans">
+      <div className="max-w-7xl mx-auto">
         
-        <Link href="/shop" className="inline-flex items-center text-sm text-zinc-400 hover:text-purple-400 mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Shop
-        </Link>
-
-        {/* --- Main Product Section --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 mb-24">
-          <div className="aspect-square relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800">
-            <Image 
-              src={product.images?.[0] || "/placeholder-image.jpg"}
-              alt={product.name}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-
-          <div className="flex flex-col justify-center">
-            <Badge className="w-fit bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 mb-4 border-0">
-              {product.category}
-            </Badge>
-            
-            <h1 className="text-3xl lg:text-5xl font-bold tracking-tight mb-4">
-              {product.name}
-            </h1>
-            
-            <p className="text-2xl font-semibold text-purple-400 mb-6">
-              ₹{product.price}
-            </p>
-
-            <Separator className="bg-zinc-800 mb-6" />
-
-            <div className="prose prose-invert mb-8">
-              <p className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                {product.description}
-              </p>
-            </div>
-
-            {/* <div className="space-y-4">
-              <div className="flex items-center text-sm text-zinc-400 mb-4">
-                <div className={`w-2 h-2 rounded-full mr-2 ${product.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
-                {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-              </div>
-
-              <Button 
-                size="lg" 
-                className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white gap-2"
-                disabled={product.stock === 0}
-              >
-                <ShoppingBag className="w-5 h-5" />
-                Add to Cart
-              </Button>
-            </div> */}
-
-            <AddToCart 
-              productId={product._id.toString()} 
-              stock={product.stock} 
-            />
-            
-            <div className="mt-10 grid grid-cols-2 gap-4 text-sm text-zinc-500 border-t border-zinc-800 pt-8">
-              <div>
-                <strong className="block text-zinc-300 mb-1">Shipping</strong>
-                Ships within 2-3 business days across India.
-              </div>
-              <div>
-                <strong className="block text-zinc-300 mb-1">Authenticity</strong>
-                100% genuine products, ethically sourced.
-              </div>
-            </div>
-          </div>
+        {/* Breadcrumb */}
+        <div className="text-sm text-zinc-500 mb-8 tracking-wide">
+          <Link href="/shop" className="hover:text-purple-400">Shop Now</Link>
+          <span className="mx-2">/</span>
+          <span className="text-zinc-300 capitalize">{product.category}</span>
+          <span className="mx-2">/</span>
+          <span className="text-zinc-100 font-medium line-clamp-1">{product.name}</span>
         </div>
 
-        {/* --- Dynamic You May Also Like Section --- */}
-        {relatedProducts.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
+          
+          {/* --- LEFT COLUMN: New Carousel --- */}
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-zinc-100 mb-8">You May Also Like</h2>
-            
-            <Carousel
-              opts={{
-                align: "start",
-                loop: false, // Turned off looping in case there are only 1-2 related items
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-4">
-                {relatedProducts.map((item) => (
-                  <CarouselItem key={item._id.toString()} className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-                    <Link href={`/shop/${item._id.toString()}`} className="group block h-full">
-                      <Card className="bg-zinc-900 border-zinc-800 overflow-hidden hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
-                        <div className="aspect-square relative overflow-hidden bg-zinc-800 flex-shrink-0">
-                          <Image 
-                            src={item.images?.[0] || "/placeholder-image.jpg"} 
-                            alt={item.name}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <CardContent className="p-5 flex flex-col flex-grow justify-between">
-                          <div>
-                            <Badge variant="outline" className="text-zinc-400 border-zinc-700 mb-3 text-xs">
-                              {item.category}
-                            </Badge>
-                            <h3 className="font-medium text-zinc-100 mb-1 line-clamp-1">{item.name}</h3>
-                          </div>
-                          <p className="text-purple-400 font-semibold mt-2">₹{item.price}</p>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              
-              <CarouselPrevious className="hidden sm:flex -left-4 md:-left-12 border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 hover:border-purple-500/50 transition-all" />
-              <CarouselNext className="hidden sm:flex -right-4 md:-right-12 border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 hover:border-purple-500/50 transition-all" />
-            </Carousel>
+            <ProductImageCarousel images={images} name={product.name} />
           </div>
-        )}
 
+          {/* RIGHT COLUMN: Product Details */}
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <Badge variant="outline" className="text-purple-400 border-purple-900/50 bg-purple-950/30 px-3 py-1 text-xs">
+                <Tag className="w-3.5 h-3.5 mr-1.5" />
+                {product.category}
+              </Badge>
+              <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tighter text-zinc-100 leading-tight">
+                {product.name}
+              </h1>
+              <p className="text-3xl font-bold text-emerald-400 tracking-tight">₹{product.price}</p>
+            </div>
+
+            <Separator className="bg-zinc-800" />
+
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <p className="text-zinc-400">Availability:</p>
+                {product.stock > 0 ? (
+                  <Badge className="bg-emerald-600 text-white border-emerald-500">{product.stock} in stock</Badge>
+                ) : (
+                  <Badge variant="destructive">Out of Stock</Badge>
+                )}
+              </div>
+              
+              <AddToCart product={JSON.parse(JSON.stringify(product))} />
+            </div>
+
+            <Separator className="bg-zinc-800" />
+
+            {/* Description */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-zinc-100 tracking-tight">Product Details</h3>
+              <div className="prose prose-zinc prose-invert prose-sm text-zinc-300 leading-relaxed max-w-none">
+                {descriptionParagraphs.map((para, index) => (
+                  <p key={index} className="mb-4 last:mb-0">{para}</p>
+                ))}
+              </div>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="pt-6 grid grid-cols-2 gap-4">
+               <div className="flex items-start gap-3 p-4 bg-zinc-900 border border-zinc-800 rounded-lg">
+                  <Truck className="w-8 h-8 text-purple-500 shrink-0" />
+                  <div>
+                     <h4 className="font-semibold text-zinc-100 text-sm">Pan India Shipping</h4>
+                     <p className="text-xs text-zinc-400 mt-1">Delivery within 5-7 working days.</p>
+                  </div>
+               </div>
+               <div className="flex items-start gap-3 p-4 bg-zinc-900 border border-zinc-800 rounded-lg">
+                  <ShieldCheck className="w-8 h-8 text-purple-500 shrink-0" />
+                  <div>
+                     <h4 className="font-semibold text-zinc-100 text-sm">Secure Packaging</h4>
+                     <p className="text-xs text-zinc-400 mt-1">Carefully packed mystical items.</p>
+                  </div>
+               </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -178,7 +178,7 @@ export default async function ShopPage({ searchParams }) {
   
   const currentCategory = params.category ? decodeURIComponent(params.category) : 'all';
   // Default the price slider to 10,000 if not set in the URL
-  const currentMaxPrice = params.maxPrice ? Number(params.maxPrice) : 10000; 
+  const currentMaxPrice = params.maxPrice ? Number(params.maxPrice) : 5000; 
 
   const query = {};
 

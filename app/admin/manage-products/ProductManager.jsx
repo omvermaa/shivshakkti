@@ -41,71 +41,36 @@ export default function ProductManager({ initialProducts }) {
   };
 
   // Handle Form Submission (Uploads to Cloudinary, then saves to DB)
-  const onSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    
-    const formEl = e.currentTarget;
-    const formData = new FormData(formEl);
+
+    const form = e.currentTarget;
+    const submitData = new FormData(form);
     
     if (editingProduct) {
-      formData.append("id", editingProduct._id);
-    }
-
-    let finalImageUrl = editingProduct?.images?.[0] || "";
-
-    // 1. If a new image was selected, upload it to Cloudinary first
-    if (selectedFile) {
-      try {
-        const uploadData = new FormData();
-        uploadData.append("file", selectedFile);
-        
-        // IMPORTANT: Replace these with your actual Cloudinary details
-        const cloudName = "dxgvwi4uu";
-        uploadData.append("upload_preset", "shivshakkti_preset"); 
-
-        const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-          method: "POST",
-          body: uploadData,
-        });
-
-        const cloudinaryData = await cloudinaryRes.json();
-
-        if (!cloudinaryRes.ok) {
-          throw new Error(cloudinaryData.error?.message || "Cloudinary upload failed");
-        }
-
-        // Get the secure link provided by Cloudinary
-        finalImageUrl = cloudinaryData.secure_url;
-      } catch (error) {
-        alert("Image upload failed: " + error.message);
-        setIsSaving(false);
-        return; // Stop the form submission if image fails
+      submitData.append("id", editingProduct._id);
+      if (editingProduct.images) {
+        submitData.append("images", JSON.stringify(editingProduct.images));
       }
-    } else if (!editingProduct) {
-      // Prevent saving a brand new product without an image
-      alert("Please select a product image.");
-      setIsSaving(false);
-      return;
     }
 
-    // 2. Replace the raw file in FormData with the Cloudinary URL text string
-    // This perfectly matches what your backend action expects!
-    formData.set("image", finalImageUrl);
+    // Call your server action
+    const res = await saveProduct(submitData);
 
-    // 3. Send the data to your MongoDB database via Server Action
-    const result = await saveProduct(formData);
-    
-    if (result.success) {
+    if (res.success) {
+      // Reset form on success...
       setIsDialogOpen(false);
+      setEditingProduct(null);
       setSelectedFile(null);
-      window.location.reload(); 
+      alert("Product saved successfully!");
+      window.location.reload(); // Quick refresh to reflect the database updates
     } else {
-      alert("Failed to save product.");
+      alert("Failed to save product: " + res.error);
     }
+
     setIsSaving(false);
   };
-
   // Handle Deletion
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
@@ -150,7 +115,7 @@ export default function ProductManager({ initialProducts }) {
               </DialogTitle>
             </DialogHeader>
             
-            <form onSubmit={onSubmit} className="space-y-4 mt-4">
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-zinc-300">Product Name</Label>
                 <Input id="name" name="name" defaultValue={editingProduct?.name} required className="bg-zinc-900 border-zinc-800" />

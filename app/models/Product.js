@@ -2,44 +2,16 @@ import mongoose, { Schema } from "mongoose";
 
 const productSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: [true, "Product name is required"],
-      trim: true,
-    },
-    description: {
-      type: String,
-      required: [true, "Product description is required"],
-    },
-    price: {
-      type: Number,
-      required: [true, "Product price is required"],
-      min: [0, "Price cannot be negative"],
-    },
-    category: {
-      type: String,
-      required: [true, "Product category is required"],
-      // You can enforce strict categories here if you want
-      enum: ["Tarot Decks", "Crystals", "Pendulums", "Incense", "Jewelry", "Other"], 
-    },
-    stock: {
-      type: Number,
-      required: true,
-      default: 0,
-      min: [0, "Stock cannot be negative"],
-    },
-    images: {
-      type: [String], // Array of URLs pointing to your CDN (e.g., Cloudinary/AWS)
-      required: true,
-    },
-    isFeatured: {
-      type: Boolean,
-      default: false, // Useful for showing top items on the homepage
-    }
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    // Ensure this is an array [] and not a single String
+    images: { type: [String], required: true, default: [] },
+    price: { type: Number, required: true },
+    stock: { type: Number, required: true, min: 0 },
+    category: { type: String, required: true },
   },
   { timestamps: true }
 );
 
 const Product = mongoose.models.Product || mongoose.model("Product", productSchema);
-
 export default Product;

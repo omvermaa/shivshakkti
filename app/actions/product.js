@@ -1,14 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { connectMongoDB } from "../lib/mongodb"; // Adjust path if your lib folder is elsewhere
-import Product from "../models/Product"; // Adjust path to your Product schema
+import { connectMongoDB } from "../lib/mongodb"; 
+import Product from "../models/Product"; 
 
-// Fetch all products
 export async function getProducts() {
   try {
     await connectMongoDB();
-    // Fetch products, sort by newest, and convert to plain JS objects
     const products = await Product.find({}).sort({ createdAt: -1 }).lean();
     return JSON.parse(JSON.stringify(products)); 
   } catch (error) {
@@ -31,19 +29,19 @@ export async function saveProduct(formData) {
       price: Number(formData.get("price")),
       category: formData.get("category"),
       stock: Number(formData.get("stock")),
-      // For now, we take a single Image URL from an input and wrap it in an array
-      images: [formData.get("image")], 
+      
+      // --- NEW: Parse the stringified array of images ---
+      images: JSON.parse(formData.get("images") || "[]"), 
     };
 
     if (id) {
-      // If an ID exists, we are EDITING
+      // EDITING
       await Product.findByIdAndUpdate(id, productData);
     } else {
-      // If no ID, we are ADDING a new product
+      // ADDING
       await Product.create(productData);
     }
 
-    // Tell Next.js to refresh the admin page and the shop page to show updates instantly
     revalidatePath("/admin/manage-products");
     revalidatePath("/shop");
     
