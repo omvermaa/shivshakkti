@@ -410,7 +410,15 @@ export default function ProductManager({ initialProducts }) {
                       unoptimized
                     />
                   </div>
-                  {item.name}
+                  <div className="flex flex-col">
+                    <span>{item.name}</span>
+                    {/* --- NEW: Renders a small badge if the product is featured --- */}
+                    {item.isFeatured && (
+                      <span className="mt-1 w-max bg-purple-500/20 text-purple-400 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">
+                        Featured
+                      </span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Badge
