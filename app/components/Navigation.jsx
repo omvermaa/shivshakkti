@@ -33,7 +33,14 @@ const UserMenu = ({ session }) => {
       <DropdownMenuTrigger asChild>
         <button className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-zinc-800 hover:border-purple-500 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500/50">
           {session.user?.image ? (
-            <Image src={session.user.image} alt="Profile" fill className="object-cover" unoptimized />
+            <Image 
+              src={session.user.image} 
+              alt="Profile" 
+              fill 
+              className="object-cover" 
+              unoptimized 
+              referrerPolicy="no-referrer" 
+            />
           ) : (
             <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-400">
               <User className="w-4 h-4" />
@@ -53,7 +60,7 @@ const UserMenu = ({ session }) => {
         <DropdownMenuSeparator className="bg-zinc-800" />
         
         {session.user?.role === "admin" && (
-          <DropdownMenuItem asChild className="hover:bg-zinc-800 hover:text-zinc-100 cursor-pointer p-2">
+          <DropdownMenuItem asChild className="hover:bg-purple-600 focus:bg-purple-600 hover:text-white focus:text-white cursor-pointer p-2 transition-colors">
             <Link href="/admin" className="flex w-full items-center">
               <LayoutDashboard className="mr-2 h-4 w-4" />
               <span>Admin Dashboard</span>
@@ -62,7 +69,7 @@ const UserMenu = ({ session }) => {
         )}
         
         {session.user?.role !== "admin" && (
-          <DropdownMenuItem asChild className="hover:bg-zinc-800 hover:text-zinc-100 cursor-pointer p-2">
+          <DropdownMenuItem asChild className="hover:bg-purple-600 focus:bg-purple-600 hover:text-white focus:text-white cursor-pointer p-2 transition-colors">
             <Link href="/orders" className="flex w-full items-center">
               <Package className="mr-2 h-4 w-4" />
               <span>My Orders</span>
@@ -70,14 +77,14 @@ const UserMenu = ({ session }) => {
           </DropdownMenuItem>
         )}
 
-        <DropdownMenuItem asChild className="hover:bg-zinc-800 hover:text-zinc-100 cursor-pointer p-2">
+        <DropdownMenuItem asChild className="hover:bg-purple-600 focus:bg-purple-600 hover:text-white focus:text-white cursor-pointer p-2 transition-colors">
           <Link href="/profile" className="flex w-full items-center">
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </Link>
         </DropdownMenuItem>
         
-        <DropdownMenuItem asChild className="hover:bg-zinc-800 hover:text-zinc-100 cursor-pointer p-2">
+        <DropdownMenuItem asChild className="hover:bg-purple-600 focus:bg-purple-600 hover:text-white focus:text-white cursor-pointer p-2 transition-colors">
           <Link href="/settings" className="flex w-full items-center">
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
@@ -88,7 +95,7 @@ const UserMenu = ({ session }) => {
         
         <DropdownMenuItem 
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 cursor-pointer p-2"
+          className="text-rose-400 hover:bg-rose-600 focus:bg-rose-600 hover:text-white focus:text-white cursor-pointer p-2 transition-colors"
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
@@ -121,7 +128,14 @@ const FullScreenMenu = ({ closeMenu, session }) => (
         <div className="flex items-center gap-4 mb-10 pb-8 border-b border-zinc-800">
            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-zinc-800 relative flex-shrink-0">
               {session.user?.image ? (
-                <Image src={session.user.image} alt="Profile" fill className="object-cover" unoptimized />
+                <Image 
+                  src={session.user.image} 
+                  alt="Profile" 
+                  fill 
+                  className="object-cover" 
+                  unoptimized 
+                  referrerPolicy="no-referrer" 
+                />
               ) : (
                 <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-400">
                   <User className="w-8 h-8" />

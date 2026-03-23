@@ -1,10 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import PriceFilter from "../components/PriceFilter"; 
+import SearchAutocomplete from "../components/SearchAutocomplete";
 import ProductCardCarousel from "../components/ProductCardCarousel"; // <-- IMPORTED HERE!
 
 import { connectMongoDB } from "../lib/mongodb";
@@ -43,7 +42,11 @@ export default async function ShopPage({ searchParams }) {
   }
 
   const products = await Product.find(query).lean();
-  const categories = ['All', 'Tarot Decks', 'Crystals', 'Pendulums', 'Incense', 'Jewelry'];
+  const categories = ['All', 'Tarot Decks', 'Crystals', 'Aura Spray', 'Incense', 'Spell jars', 'Other', 'Jewelry', 'Bath Salts'];
+  
+  // Fetch all product names to use as search suggestions
+  const allProductsForSearch = await Product.find({}, { name: 1 }).lean();
+  const searchSuggestions = allProductsForSearch.map(p => ({ _id: p._id.toString(), name: p.name }));
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-12 px-6 lg:px-12">
@@ -84,21 +87,14 @@ export default async function ShopPage({ searchParams }) {
 
         {/* Main Content */}
         <main className="flex-1">
-          <form action="/shop" method="GET" className="mb-8 flex flex-col sm:flex-row gap-4">
-            {currentCategory !== 'all' && <input type="hidden" name="category" value={currentCategory} />}
-            <input type="hidden" name="maxPrice" value={currentMaxPrice} />
-            
-            <Input 
-              name="q"
-              type="text" 
-              defaultValue={params.q || ""}
-              placeholder="Search for mystical items..." 
-              className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-purple-500/50"
+          <div className="mb-8 flex flex-col sm:flex-row gap-4">
+            <SearchAutocomplete 
+              initialQuery={params.q || ""} 
+              currentCategory={currentCategory} 
+              currentMaxPrice={currentMaxPrice} 
+              suggestions={searchSuggestions} 
             />
-            <Button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white shrink-0">
-              Search
-            </Button>
-          </form>
+          </div>
 
           {products.length === 0 ? (
             <div className="text-center py-20 text-zinc-500 border border-dashed border-zinc-800 rounded-xl bg-zinc-900/30">

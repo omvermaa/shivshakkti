@@ -79,11 +79,11 @@ export default function ContactPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-zinc-300">Your Name</Label>
-                      <Input id="name" name="name" required placeholder="Jane Doe" className="bg-zinc-950 border-zinc-800" />
+                      <Input id="name" name="name" required className="bg-zinc-950 border-zinc-800" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-zinc-300">Email Address</Label>
-                      <Input id="email" name="email" type="email" required placeholder="jane@example.com" className="bg-zinc-950 border-zinc-800" />
+                      <Input id="email" name="email" type="email" required className="bg-zinc-950 border-zinc-800" />
                     </div>
                   </div>
 
