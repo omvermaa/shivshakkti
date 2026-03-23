@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Slider } from "./ui/slider";
 
@@ -10,11 +10,13 @@ export default function PriceFilter({ initialPrice }) {
   
   // State to hold the current slider value (array format for Radix UI Slider)
   const [price, setPrice] = useState([initialPrice]);
+  const [prevInitialPrice, setPrevInitialPrice] = useState(initialPrice);
 
   // Sync state if the URL changes externally (e.g., clicking back button)
-  useEffect(() => {
+  if (initialPrice !== prevInitialPrice) {
+    setPrevInitialPrice(initialPrice);
     setPrice([initialPrice]);
-  }, [initialPrice]);
+  }
 
   // Triggered ONLY when the user lets go of the slider thumb
   const handleValueCommit = (val) => {

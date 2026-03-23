@@ -38,10 +38,18 @@ export default function CartDrawer() {
 
   // Fetch initial cart on mount and setup listener for global updates
   useEffect(() => {
-    fetchCart(); 
+    // Background fetch without triggering the loading UI state
+    const fetchBackgroundCart = async () => {
+      const res = await getCart();
+      if (res.success) {
+        setCart(res.cart);
+      }
+    };
+
+    fetchBackgroundCart(); 
 
     const handleGlobalCartUpdate = () => {
-      fetchCart();
+      fetchBackgroundCart();
     };
 
     window.addEventListener("cartUpdated", handleGlobalCartUpdate);
