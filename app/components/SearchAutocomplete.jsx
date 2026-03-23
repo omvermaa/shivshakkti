@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Search } from "lucide-react";
+import { Search, ArrowUpRight } from "lucide-react";
 
 export default function SearchAutocomplete({ 
   initialQuery, 
@@ -13,14 +14,14 @@ export default function SearchAutocomplete({
   suggestions = [] 
 }) {
   const router = useRouter();
-  const [query, setQuery] = useState(initialQuery);
+  const [query, setQuery] = useState(initialQuery || "");
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef(null);
 
   // Filter suggestions based on query
   const filteredSuggestions = suggestions.filter(s => 
     s.name.toLowerCase().includes(query.toLowerCase())
-  ).slice(0, 8); // Limit to top 8 suggestions
+  ).slice(0, 6); // Limit to top 6 for a cleaner dropdown look
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -36,8 +37,8 @@ export default function SearchAutocomplete({
   const handleSubmit = (e, searchVal = query) => {
     if (e) e.preventDefault();
     const params = new URLSearchParams();
-    if (currentCategory !== 'all') params.set("category", currentCategory);
-    params.set("maxPrice", currentMaxPrice);
+    if (currentCategory && currentCategory !== 'all') params.set("category", currentCategory);
+    if (currentMaxPrice) params.set("maxPrice", currentMaxPrice);
     if (searchVal.trim()) params.set("q", searchVal.trim());
     
     setIsOpen(false);
@@ -58,24 +59,47 @@ export default function SearchAutocomplete({
             autoComplete="off"
           />
           
-          {/* Dropdown List */}
+          {/* Enhanced Dropdown List */}
           {isOpen && query.trim() && filteredSuggestions.length > 0 && (
-            <ul className="absolute z-50 w-full mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden">
+            <ul className="absolute z-50 w-full mt-2 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl shadow-purple-500/10 overflow-hidden divide-y divide-zinc-800/50">
               {filteredSuggestions.map((item, index) => (
                 <li 
                   key={item._id || index}
-                  className="px-4 py-3 text-sm text-zinc-300 hover:bg-purple-600 hover:text-white cursor-pointer transition-colors flex items-center gap-2 border-b border-zinc-800/50 last:border-none"
+                  className="p-3 hover:bg-zinc-900 cursor-pointer transition-colors flex items-center gap-4 group"
                   onClick={() => { setQuery(item.name); handleSubmit(null, item.name); }}
                 >
-                  <Search className="w-3.5 h-3.5 opacity-50 flex-shrink-0" />
-                  <span className="line-clamp-1">{item.name}</span>
+                  {/* Product Thumbnail */}
+                  <div className="relative w-12 h-12 rounded-md overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-800 group-hover:border-purple-500/30 transition-colors">
+                    <Image 
+                      src={item.images?.[0] || "/placeholder-image.jpg"} 
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+
+                  {/* Product Details */}
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    <span className="text-sm font-medium text-zinc-200 group-hover:text-purple-400 transition-colors truncate">
+                      {item.name}
+                    </span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs text-zinc-500">{item.category}</span>
+                      <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+                      <span className="text-xs font-semibold text-emerald-400">₹{item.price}</span>
+                    </div>
+                  </div>
+
+                  {/* Action Icon */}
+                  <ArrowUpRight className="w-4 h-4 text-zinc-600 group-hover:text-purple-400 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                 </li>
               ))}
             </ul>
           )}
         </div>
         <Button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white shrink-0">
-          Search
+          <Search className="w-4 h-4 mr-2 hidden sm:block" /> Search
         </Button>
       </form>
     </div>

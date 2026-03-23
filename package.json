@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cross-env WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true NEXT_DISABLE_TURBOPACK=1 next dev",
+    "dev": "cross-env WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true NEXT_DISABLE_TURBOPACK=1 next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

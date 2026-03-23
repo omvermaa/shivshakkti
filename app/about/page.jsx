@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Instagram, Sparkles, Moon, Sun } from "lucide-react";
+import aboutImage from "./about.jpg";
 
 export default function AboutPage() {
   return (
@@ -22,7 +23,7 @@ export default function AboutPage() {
           <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl shadow-purple-500/10">
             {/* Replace with an actual image of the client or a nice tarot aesthetic image from Cloudinary */}
             <Image 
-              src="/moon.gif" 
+              src={aboutImage} 
               alt="ShivShakkti Tarot Mystical Energy" 
               fill 
               className="object-cover opacity-80" 

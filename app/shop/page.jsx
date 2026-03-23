@@ -45,8 +45,8 @@ export default async function ShopPage({ searchParams }) {
   const categories = ['All', 'Tarot Decks', 'Crystals', 'Aura Spray', 'Incense', 'Spell jars', 'Other', 'Jewelry', 'Bath Salts'];
   
   // Fetch all product names to use as search suggestions
-  const allProductsForSearch = await Product.find({}, { name: 1 }).lean();
-  const searchSuggestions = allProductsForSearch.map(p => ({ _id: p._id.toString(), name: p.name }));
+  const allProductsForSearch = await Product.find({}, { name: 1, images: 1, category: 1, price: 1 }).lean();
+  const searchSuggestions = allProductsForSearch.map(p => ({ _id: p._id.toString(), name: p.name, images: p.images, category: p.category, price: p.price }));
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-12 px-6 lg:px-12">

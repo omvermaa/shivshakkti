@@ -125,10 +125,10 @@ export default function LandingClient() {
           </div>
 
           <Link
-            href="/store"
+            href="/services"
             className="flex-1 md:flex-none px-0 py-3 sm:px-8 sm:py-4 md:py-3 text-full md:text-base font-semibold tracking-wider sm:tracking-widest text-white uppercase transition-all duration-300 border rounded-[30px] bg-black/30 border-white/40 backdrop-blur-md hover:bg-white/20 hover:border-white text-center whitespace-nowrap"
           >
-            Visit Store
+            Book Session
           </Link>
         </div>
       </div>
