@@ -1,23 +1,53 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { createRazorpayOrder, verifyAndSaveOrder } from "../actions/checkout";
+import Image from "next/image";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
-import { Loader2, CheckCircle2, ShieldCheck, MapPin, LocateFixed } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
+import { Loader2, CheckCircle2, MapPin, LocateFixed, ShieldCheck } from "lucide-react";
+
+import { createRazorpayOrder, verifyAndSaveOrder } from "../actions/checkout"; 
 
 const indianStates = [
-  "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", 
-  "Bihar", "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman and Diu", 
-  "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", 
-  "Jharkhand", "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", 
-  "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", 
-  "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", 
-  "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+  "Andaman and Nicobar Islands",
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chandigarh",
+  "Chhattisgarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jammu and Kashmir",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Ladakh",
+  "Lakshadweep",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Puducherry",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal"
 ];
 
 const loadRazorpayScript = () => {
@@ -35,7 +65,6 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
-
   const [formData, setFormData] = useState({
     name: user?.name || "",
     phone: user?.phone || "",
@@ -58,7 +87,6 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
       alert("Geolocation is not supported by your browser.");
       return;
     }
-
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -66,22 +94,18 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
           const { latitude, longitude } = position.coords;
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
           const data = await res.json();
-
           if (data && data.address) {
             const addr = data.address;
             const fetchedCity = addr.city || addr.town || addr.village || addr.state_district || "";
             const fetchedZip = addr.postcode ? addr.postcode.replace(/\D/g, "").slice(0, 6) : "";
-            
             let fetchedState = addr.state || "";
             if (fetchedState.includes("Delhi")) fetchedState = "Delhi";
-            
-            const matchedState = indianStates.find(s => s.toLowerCase() === fetchedState.toLowerCase()) || "";
-
-            setFormData(prev => ({
+            const matchedState = indianStates.find((s) => s.toLowerCase() === fetchedState.toLowerCase()) || "";
+            setFormData((prev) => ({
               ...prev,
               city: fetchedCity || prev.city,
               state: matchedState || prev.state,
-              zipCode: fetchedZip || prev.zipCode,
+              zipCode: fetchedZip || prev.zipCode
             }));
           }
         } catch (error) {
@@ -97,9 +121,7 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
     );
   };
 
-  const isFormValid = Object.values(formData).every((val) => val.trim() !== "") 
-                      && formData.phone.length === 10 
-                      && formData.zipCode.length === 6;
+  const isFormValid = Object.values(formData).every((val) => val.trim() !== "") && formData.phone.length === 10 && formData.zipCode.length === 6;
 
   const handlePayment = async () => {
     setIsProcessing(true);
@@ -130,29 +152,37 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
         contact: formData.phone,
       },
       theme: { color: "#9333ea" },
+      
+      modal: {
+        ondismiss: function() {
+          setIsProcessing(false);
+        }
+      },
+      
       handler: async function (response) {
         const saveResult = await verifyAndSaveOrder(response, formData, cart, totalAmount);
         if (saveResult.success) {
           setIsSuccess(true);
           setTimeout(() => router.push("/orders"), 2000);
         } else {
-          alert("Payment verification failed! Please contact support.");
-          setIsProcessing(false);
+          router.push("/checkout/failed");
         }
       },
     };
 
     const paymentObject = new window.Razorpay(options);
+    
     paymentObject.on("payment.failed", function (response) {
-      alert(response.error.description);
-      setIsProcessing(false);
+      paymentObject.close(); 
+      router.push("/checkout/failed");
     });
+    
     paymentObject.open();
   };
 
   if (isSuccess) {
     return (
-      <Card className="bg-zinc-900 border-emerald-500/50 max-w-lg mx-auto py-12 text-center animate-in fade-in zoom-in duration-500">
+      <Card className="bg-zinc-900 border-emerald-500/50 max-w-lg mx-auto py-12 text-center animate-in fade-in zoom-in duration-500 mt-8">
         <CheckCircle2 className="w-20 h-20 text-emerald-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-zinc-100 mb-2">Order Placed Successfully!</h2>
         <p className="text-zinc-400 mb-6">Redirecting to your orders page...</p>
@@ -163,7 +193,6 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      
       <div className="space-y-6">
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -173,13 +202,7 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
                 Shipping Details
               </CardTitle>
             </div>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={handleAutofillLocation}
-              disabled={isLocating}
-              className="border-zinc-700 bg-zinc-950 text-zinc-300 hover:bg-zinc-800 hover:text-white text-xs h-9"
-            >
+            <Button type="button" variant="outline" onClick={handleAutofillLocation} disabled={isLocating} className="border-zinc-700 bg-zinc-950 text-zinc-300 hover:bg-zinc-800 hover:text-white text-xs h-9">
               {isLocating ? <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" /> : <LocateFixed className="w-3.5 h-3.5 mr-2 text-purple-400" />}
               Auto-fill
             </Button>
@@ -208,9 +231,7 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
                 <Label htmlFor="state" className="text-zinc-300">State</Label>
                 <select id="state" name="state" value={formData.state} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50">
                   <option value="" disabled>Select a state</option>
-                  {indianStates.map((state) => (
-                    <option key={state} value={state}>{state}</option>
-                  ))}
+                  {indianStates.map((state) => <option key={state} value={state}>{state}</option>)}
                 </select>
               </div>
             </div>
@@ -228,6 +249,7 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
         </Card>
       </div>
 
+      {/* Order Summary */}
       <div className="space-y-6">
         <Card className="bg-zinc-900 border-zinc-800 sticky top-28">
           <CardHeader>
@@ -236,9 +258,15 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
           <CardContent className="space-y-6">
             <div className="space-y-4 max-h-60 overflow-y-auto pr-2">
               {cart.map((item) => (
-                <div key={item._id} className="flex gap-4">
+                <div key={item.product._id} className="flex gap-4">
                   <div className="w-16 h-16 relative rounded-md overflow-hidden bg-zinc-800 flex-shrink-0">
-                    <Image src={item.product.images?.[0] || "/placeholder-image.jpg"} alt={item.product.name} fill className="object-cover" unoptimized />
+                    <Image 
+                      src={item.product.images?.[0] || "/placeholder-image.jpg"} 
+                      alt={item.product.name} 
+                      fill 
+                      className="object-cover"
+                      unoptimized
+                    />
                   </div>
                   <div className="flex-1">
                     <h4 className="text-sm font-medium text-zinc-100 line-clamp-1">{item.product.name}</h4>
@@ -248,7 +276,6 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
                 </div>
               ))}
             </div>
-
             <div className="pt-4 border-t border-zinc-800 space-y-3">
               <div className="flex justify-between text-zinc-400">
                 <span>Subtotal</span>
@@ -263,7 +290,6 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
                 <span className="text-purple-400">₹{totalAmount}</span>
               </div>
             </div>
-
             <Button onClick={handlePayment} disabled={!isFormValid || isProcessing} className="w-full h-12 text-lg bg-purple-600 hover:bg-purple-700 text-white gap-2 shadow-[0_0_20px_rgba(147,51,234,0.3)] disabled:opacity-50">
               {isProcessing ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : isFormValid ? <><ShieldCheck className="w-5 h-5" /> Pay ₹{totalAmount} via Razorpay</> : "Fill valid address to pay"}
             </Button>

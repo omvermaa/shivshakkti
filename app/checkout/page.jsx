@@ -5,6 +5,7 @@ import { getCart } from "../actions/cart";
 import { getUserProfile } from "../actions/user";
 import CheckoutForm from "./CheckoutForm";
 import { Package } from "lucide-react";
+import Link from "next/link";
 
 export default async function CheckoutPage() {
   const session = await getServerSession(authOptions);
@@ -16,7 +17,7 @@ export default async function CheckoutPage() {
     getUserProfile()
   ]);
 
-  const cart = cartRes.success ? cartRes.cart : [];
+  const cart = cartRes.success ? cartRes.cart.filter(item => item && item.product) : [];
   const user = profileRes.success ? profileRes.user : null;
 
   if (cart.length === 0) {
@@ -25,13 +26,13 @@ export default async function CheckoutPage() {
         <Package className="w-16 h-16 text-zinc-700 mb-4" />
         <h1 className="text-2xl font-bold mb-2">Your cart is empty</h1>
         <p className="text-zinc-500 mb-6">Add some mystical items to your cart before checking out.</p>
-        <a href="/shop" className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-md text-white font-medium transition">Return to Shop</a>
+        <Link href="/shop" className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-md text-white font-medium transition">Return to Shop</Link>
       </div>
     );
   }
 
   // Calculate Total
-  const totalAmount = cart.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  const totalAmount = cart.reduce((total, item) => total + (item.product?.price * item.quantity || 0), 0);
 
   return (
     <div className="min-h-screen bg-zinc-950 pt-32 pb-12 px-6 lg:px-12 text-zinc-50">

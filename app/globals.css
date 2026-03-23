@@ -244,4 +244,4 @@ body.custom-cursor-active .cursor-default {
   filter: grayscale(100%) blur(3px);
   mix-blend-mode: overlay;
   animation: wwo-cloud-drift-c 54s ease-in-out infinite alternate;
-}
+} 
