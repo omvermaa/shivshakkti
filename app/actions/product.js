@@ -23,6 +23,7 @@ export async function saveProduct(formData) {
     const id = formData.get("id");
     
     // Extract form data
+    // Extract form data
     const productData = {
       name: formData.get("name"),
       description: formData.get("description"),
@@ -30,7 +31,9 @@ export async function saveProduct(formData) {
       category: formData.get("category"),
       stock: Number(formData.get("stock")),
       
-      // --- NEW: Parse the stringified array of images ---
+      // --- NEW: Parse the Featured Checkbox ---
+      isFeatured: formData.get("isFeatured") === "true", 
+      
       images: JSON.parse(formData.get("images") || "[]"), 
     };
 

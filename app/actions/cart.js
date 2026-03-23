@@ -2,121 +2,103 @@
 
 import { connectMongoDB } from "../lib/mongodb";
 import User from "../models/User";
+import Product from "../models/Product"; // Make sure Product is imported for population
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
-import { revalidatePath } from "next/cache";
+import { revalidatePath } from "next/cache"; // <-- NEW: Import revalidatePath
 
-export async function addToCart(productId, quantity) {
+// 1. Fetch Cart
+export async function getCart() {
   try {
-    // 1. Get the current logged-in user
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return { success: false, error: "unauthorized" };
-    }
+    if (!session?.user?.email) return { success: false, error: "Unauthorized" };
 
     await connectMongoDB();
+    const user = await User.findOne({ email: session.user.email }).populate("cart.product").lean();
+    
+    if (!user) return { success: false, cart: [] };
+    
+    // Filter out any broken references (in case a product was deleted from the DB)
+    const validCart = user.cart.filter(item => item.product != null);
 
-    // 2. Find the user in the database
+    return { success: true, cart: JSON.parse(JSON.stringify(validCart)) };
+  } catch (error) {
+    console.error("Get cart error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// 2. Add to Cart
+export async function addToCart(productId, quantity = 1) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) return { success: false, error: "unauthorized" };
+
+    await connectMongoDB();
     const user = await User.findOne({ email: session.user.email });
+    
     if (!user) return { success: false, error: "User not found" };
 
-    // --- THE FIX: Initialize the cart if it doesn't exist for older users ---
-    if (!user.cart) {
-      user.cart = [];
-    }
+    const cartItemIndex = user.cart.findIndex(item => item.product.toString() === productId);
 
-    // 3. Check if the product is already in the cart
-    const existingItemIndex = user.cart.findIndex(
-      (item) => item.product.toString() === productId
-    );
-
-    if (existingItemIndex > -1) {
-      // If it exists, add the new quantity to the existing quantity
-      user.cart[existingItemIndex].quantity += quantity;
+    if (cartItemIndex > -1) {
+      // Item exists, just update the quantity
+      user.cart[cartItemIndex].quantity += quantity;
     } else {
-      // If it's a new item, push it to the cart array
+      // New item, push to cart array
       user.cart.push({ product: productId, quantity });
     }
 
     await user.save();
-    
-    // Refresh the layout so the navbar cart icon (if you add one later) updates
+
+    // --- THE FIX: Instantly forces the Navbar/Layout to refresh with new data ---
     revalidatePath("/", "layout"); 
-    
+
     return { success: true };
   } catch (error) {
-    console.error("Cart error:", error);
+    console.error("Add to cart error:", error);
     return { success: false, error: error.message };
   }
 }
 
-export async function getCart() {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) return { success: false, error: "unauthorized" };
-
-    await connectMongoDB();
-    
-    // We use .populate('cart.product') to automatically fetch the full product details 
-    // for every ID stored in the user's cart array.
-    const user = await User.findOne({ email: session.user.email })
-      .populate("cart.product")
-      .lean();
-    
-    if (!user) return { success: false, error: "User not found" };
-
-    return { 
-      success: true, 
-      cart: JSON.parse(JSON.stringify(user.cart || [])) 
-    };
-  } catch (error) {
-    console.error("Fetch cart error:", error);
-    return { success: false, error: error.message };
-  }
-}
-
-export async function updateCartQuantity(productId, newQuantity) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) return { success: false, error: "unauthorized" };
-
-    await connectMongoDB();
-    const user = await User.findOne({ email: session.user.email });
-    
-    if (!user) return { success: false, error: "User not found" };
-
-    const itemIndex = user.cart.findIndex(item => item.product.toString() === productId);
-    
-    if (itemIndex > -1) {
-      user.cart[itemIndex].quantity = newQuantity;
-      await user.save();
-      
-      revalidatePath("/", "layout");
-      return { success: true };
-    }
-    
-    return { success: false, error: "Item not in cart" };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-}
-
-// Completely remove an item from the cart
+// 3. Remove from Cart
 export async function removeFromCart(productId) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) return { success: false, error: "unauthorized" };
 
     await connectMongoDB();
-    const user = await User.findOne({ email: session.user.email });
     
-    if (!user) return { success: false, error: "User not found" };
+    await User.findOneAndUpdate(
+      { email: session.user.email },
+      { $pull: { cart: { product: productId } } }
+    );
 
-    // Filter out the item that matches the productId
-    user.cart = user.cart.filter(item => item.product.toString() !== productId);
-    await user.save();
-    
+    // --- THE FIX: Refresh globally ---
     revalidatePath("/", "layout");
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+// 4. Update Cart Quantity
+export async function updateCartQuantity(productId, quantity) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) return { success: false, error: "unauthorized" };
+
+    await connectMongoDB();
+    
+    await User.findOneAndUpdate(
+      { email: session.user.email, "cart.product": productId },
+      { $set: { "cart.$.quantity": quantity } }
+    );
+
+    // --- THE FIX: Refresh globally ---
+    revalidatePath("/", "layout");
+
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };

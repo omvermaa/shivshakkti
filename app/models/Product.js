@@ -4,11 +4,12 @@ const productSchema = new Schema(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
-    // Ensure this is an array [] and not a single String
-    images: { type: [String], required: true, default: [] },
     price: { type: Number, required: true },
-    stock: { type: Number, required: true, min: 0 },
+    images: [{ type: String }],
     category: { type: String, required: true },
+    stock: { type: Number, required: true, default: 0 },
+    // --- NEW: Added Featured Flag ---
+    isFeatured: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

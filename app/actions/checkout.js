@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { connectMongoDB } from "../lib/mongodb";
 import Order from "../models/Order";
 import User from "../models/User";
+import Product from "../models/Product"; // <-- NEW: Imported Product model
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
@@ -19,7 +20,7 @@ const razorpay = new Razorpay({
 export async function createRazorpayOrder(amount) {
   try {
     const options = {
-      amount: Math.round(amount * 100), // Razorpay strictly requires amount in paise (₹1 = 100 paise)
+      amount: Math.round(amount * 100), 
       currency: "INR",
       receipt: `receipt_${Date.now()}`,
     };
@@ -61,7 +62,6 @@ export async function verifyAndSaveOrder(paymentData, shippingDetails, cartItems
       price: item.product.price,
     }));
 
-    // Format full address string
     const fullAddress = `${shippingDetails.street}, ${shippingDetails.city}, ${shippingDetails.state}, ${shippingDetails.zipCode}, ${shippingDetails.country}`;
 
     // Create the Order
@@ -80,6 +80,13 @@ export async function verifyAndSaveOrder(paymentData, shippingDetails, cartItems
       razorpayPaymentId: razorpay_payment_id,
     });
 
+    // --- NEW: Deduct Stock from the Database ---
+    for (const item of cartItems) {
+      await Product.findByIdAndUpdate(item.product._id, {
+        $inc: { stock: -item.quantity } // Subtracts the purchased quantity from the current stock
+      });
+    }
+
     // Empty the user's cart now that they have bought the items
     await User.findOneAndUpdate(
       { email: session.user.email },
@@ -89,6 +96,8 @@ export async function verifyAndSaveOrder(paymentData, shippingDetails, cartItems
     // Instantly refresh all relevant pages
     revalidatePath("/orders");
     revalidatePath("/admin/orders");
+    revalidatePath("/admin/manage-products"); // Refresh admin inventory
+    revalidatePath("/shop"); // Refresh shop grid
     revalidatePath("/", "layout");
 
     return { success: true, orderId: newOrder._id };

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { ShoppingBag, Zap, Minus, Plus, Loader2 } from "lucide-react";
 import { addToCart } from "../actions/cart";
+import { toast } from "sonner"; // <-- NEW: Import toast
 
 export default function AddToCart({ productId, stock }) {
   const router = useRouter();
@@ -21,20 +22,22 @@ export default function AddToCart({ productId, stock }) {
     const result = await addToCart(productId, quantity);
 
     if (result.success) {
-      // alert("Added to cart successfully!");
-      router.refresh(); // Refreshes the server state
+      // --- NEW: Replaced alert with a beautiful toast ---
+      toast.success("Added to cart successfully!"); 
+      // --- NEW: Shout to the Navbar that the cart has changed! ---
+      window.dispatchEvent(new Event("cartUpdated"));
+      router.refresh(); 
     } else if (result.error === "unauthorized") {
-      alert("Please log in to add items to your cart.");
+      toast.error("Please log in to add items to your cart.");
       router.push("/user-login");
     } else {
-      alert("Error adding to cart: " + result.error);
+      toast.error("Error adding to cart: " + result.error);
     }
     setIsAdding(false);
   };
 
   // Handle Buy Now (Bypass Cart)
   const handleBuyNow = () => {
-    // Send them directly to checkout with URL parameters for this specific item
     router.push(`/checkout?buyNow=${productId}&qty=${quantity}`);
   };
 

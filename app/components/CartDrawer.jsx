@@ -8,11 +8,24 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui
 import { Button } from "./ui/button";
 import { getCart, updateCartQuantity, removeFromCart } from "../actions/cart";
 
+// --- NEW: Import Alert Dialog Components ---
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+
 export default function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const [cart, setCart] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [updatingId, setUpdatingId] = useState(null); // Prevents spam clicking
+  const [updatingId, setUpdatingId] = useState(null); 
 
   const fetchCart = async () => {
     setIsLoading(true);
@@ -23,7 +36,18 @@ export default function CartDrawer() {
     setIsLoading(false);
   };
 
-  // Fetch data in the event handler instead of a side effect
+  // Fetch initial cart on mount and setup listener for global updates
+  useEffect(() => {
+    fetchCart(); 
+
+    const handleGlobalCartUpdate = () => {
+      fetchCart();
+    };
+
+    window.addEventListener("cartUpdated", handleGlobalCartUpdate);
+    return () => window.removeEventListener("cartUpdated", handleGlobalCartUpdate);
+  }, []);
+
   const handleOpenChange = (open) => {
     setIsOpen(open);
     if (open) {
@@ -31,17 +55,13 @@ export default function CartDrawer() {
     }
   };
 
-
-  // --- NEW: Handle Quantity Changes ---
   const handleQuantityChange = async (productId, currentQty, change, maxStock) => {
     const newQty = currentQty + change;
-    
-    // Prevent going below 1 or above available stock
     if (newQty < 1 || newQty > maxStock) return;
 
     setUpdatingId(productId);
     
-    // Optimistic UI update (feels instant to the user)
+    // Optimistic UI update
     setCart(cart.map(item => 
       item.product._id === productId ? { ...item, quantity: newQty } : item
     ));
@@ -51,7 +71,6 @@ export default function CartDrawer() {
     setUpdatingId(null);
   };
 
-  // --- NEW: Handle Item Removal ---
   const handleRemoveItem = async (productId) => {
     setUpdatingId(productId);
     
@@ -132,7 +151,6 @@ export default function CartDrawer() {
                         </p>
                       </div>
                       
-                      {/* --- NEW: Interactive Controls --- */}
                       <div className="flex items-center justify-between mt-auto pt-2">
                         
                         {/* + / - Controls */}
@@ -158,16 +176,36 @@ export default function CartDrawer() {
                           </button>
                         </div>
 
-                        {/* Trash Button */}
-                        <button 
-                          onClick={() => handleRemoveItem(item.product._id)}
-                          className="p-1.5 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors"
-                          aria-label="Remove item"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                        {/* --- NEW: Wrapped Trash Button in AlertDialog --- */}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button 
+                              className="p-1.5 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors"
+                              aria-label="Remove item"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="text-zinc-100">Remove item from cart?</AlertDialogTitle>
+                              <AlertDialogDescription className="text-zinc-400">
+                                Are you sure you want to remove <span className="text-zinc-300 font-medium">{item.product.name}</span>?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="bg-transparent border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white">Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => handleRemoveItem(item.product._id)}
+                                className="bg-rose-600 hover:bg-rose-700 text-white"
+                              >
+                                Remove
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
 
+                      </div>
                     </div>
                   </div>
                 );
@@ -182,7 +220,6 @@ export default function CartDrawer() {
               <span className="text-zinc-400">Total</span>
               <span className="text-xl font-bold text-zinc-100">₹{cartTotal}</span>
             </div>
-            {/* Direct to Checkout page, passing the drawer closure callback if needed */}
             <Button asChild className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_20px_rgba(147,51,234,0.2)]">
               <Link href="/checkout" onClick={() => setIsOpen(false)}>
                 Proceed to Checkout
