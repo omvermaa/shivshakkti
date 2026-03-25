@@ -47,7 +47,7 @@ export default function UnauthorizedPage() {
             </div>
             
             <h1 className="text-2xl font-bold tracking-tight text-zinc-100 mb-2">
-              Access Denied
+              Access Denied!
             </h1>
             
             <p className="text-zinc-400 mb-8">
