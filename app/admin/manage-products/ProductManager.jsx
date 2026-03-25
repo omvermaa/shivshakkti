@@ -237,6 +237,7 @@ export default function ProductManager({ initialProducts }) {
                   className="flex h-10 w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm focus-visible:ring-purple-500/50"
                 >
                   <option value="Spell Jars">Spell Jars</option>
+                  <option value="Oils">Oils</option>
                   <option value="Crystals">Crystals</option>
                   <option value="Incense">Incense</option>
                   <option value="Jewellery">Jewellery</option>
