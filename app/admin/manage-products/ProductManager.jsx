@@ -239,7 +239,7 @@ export default function ProductManager({ initialProducts }) {
                   <option value="Spell Jars">Spell Jars</option>
                   <option value="Oils">Oils</option>
                   <option value="Crystals">Crystals</option>
-                  <option value="Incense">Incense</option>
+                  <option value="Spray">Spray</option>
                   <option value="Jewellery">Jewellery</option>
                   <option value="Bath Salts">Bath Salts</option>
                   <option value="Other">Other</option>

@@ -37,7 +37,7 @@ export default async function ShopPage({ searchParams }) {
   const currentMaxPrice = params.maxPrice ? Number(params.maxPrice) : ABSOLUTE_MAX_PRICE; 
   const searchQuery = params.q || "";
 
-  const categories = ['All', 'Spell Jars', 'Oils', 'Crystals', 'Incense', 'Jewellery', 'Bath Salts', 'Other'];
+  const categories = ['All', 'Spell Jars', 'Oils', 'Crystals', 'Spray', 'Jewellery', 'Bath Salts', 'Other'];
   const showCategoryPrompt = currentCategory === 'all' && !searchQuery;
 
   const featuredProducts = await Product.find({ isFeatured: true }).lean();
