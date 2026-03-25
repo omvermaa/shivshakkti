@@ -36,7 +36,7 @@ export default async function ShopPage({ searchParams }) {
     query.price = { $lte: currentMaxPrice };
   }
 
-  const categories = ['All', 'Spell Jars', 'Crystals', 'Incense', 'Jewellery', 'Bath Salts', 'Other'];
+  const categories = ['All', 'Spell Jars', 'Oils', 'Crystals', 'Incense', 'Jewellery', 'Bath Salts', 'Other'];
 
   // Performance & UX Logic
   // If they are on "All" and haven't searched for anything, prompt them to pick a category
