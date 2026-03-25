@@ -65,7 +65,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-zinc-100">Email Us</h3>
-                  <p className="text-sm text-zinc-400 mt-1">hello@shivshakktitarot.com</p>
+                  <p className="text-sm text-zinc-400 mt-1">shivshakktitarrot@gmail.com</p>
                 </div>
               </CardContent>
             </Card>

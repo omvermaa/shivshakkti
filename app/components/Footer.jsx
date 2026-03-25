@@ -46,9 +46,9 @@ export default function Footer() {
               <Instagram className="w-4 h-4" />
               @shivshakktitarot
             </a>
-            <a href="mailto:hello@shivshakktitarot.com" className="flex items-center gap-3 text-sm hover:text-purple-400 transition-colors w-fit">
+            <a href="mailto:shivshakktitarrot@gmail.com" className="flex items-center gap-3 text-sm hover:text-purple-400 transition-colors w-fit">
               <Mail className="w-4 h-4" />
-              hello@shivshakktitarot.com
+              shivshakktitarrot@gmail.com
             </a>
             <div className="flex items-center gap-3 text-sm">
               <MapPin className="w-4 h-4" />
