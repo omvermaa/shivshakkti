@@ -47,7 +47,7 @@ export default async function ShopPage({ searchParams }) {
   const products = await Product.find(query).lean();
   const featuredProducts = await Product.find({ isFeatured: true }).lean();
   
-  const categories = ['All', 'Tarot Decks', 'Crystals', 'Pendulums', 'Incense', 'Jewelry', 'Other'];
+  const categories = ['All', 'Spell Jars', 'Crystals', 'Incense', 'Jewellery', 'Bath Salts', 'Other'];
   
   const allProductsForSearch = await Product.find({}, { name: 1, images: 1, category: 1, price: 1 }).lean();
   const searchSuggestions = allProductsForSearch.map(p => ({ 

@@ -236,12 +236,10 @@ export default function ProductManager({ initialProducts }) {
                   defaultValue={editingProduct?.category || "Tarot Decks"}
                   className="flex h-10 w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm focus-visible:ring-purple-500/50"
                 >
-                  <option value="Tarot Decks">Tarot Decks</option>
+                  <option value="Spell Jars">Spell Jars</option>
                   <option value="Crystals">Crystals</option>
-                  <option value="Aura Spray">Aura Spray</option>
                   <option value="Incense">Incense</option>
-                  <option value="Spell jars">Spell jars</option>
-                  <option value="Jewelry">Jewelry</option>
+                  <option value="Jewellery">Jewellery</option>
                   <option value="Bath Salts">Bath Salts</option>
                   <option value="Other">Other</option>
                 </select>
