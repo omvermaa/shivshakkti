@@ -1,6 +1,6 @@
 
-
 import Link from "next/link";
+import Image from "next/image"; // <-- NEW: Imported Next.js Image
 import { Suspense } from "react"; 
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -10,18 +10,19 @@ import ProductCardCarousel from "../components/ProductCardCarousel";
 import FeaturedCarousel from "../components/FeaturedCarousel";
 import MobileFilterWrapper from "../components/MobileFilterWrapper";
 import { Sparkles, Compass, ArrowLeft } from "lucide-react"; 
+import Spray from "@/app/assets/spray.webp";
+import spellJar from "@/app/assets/spelljars.webp";
+import oil from "@/app/assets/oils.webp";
+import crystal from "@/app/assets/crystals.webp";
+import bracelets from "@/app/assets/bracelets.webp";
+import bathSalt from "@/app/assets/bathsalts.webp";
+
 
 import { connectMongoDB } from "../lib/mongodb";
 import Product from "../models/Product";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: 'Shop Mystical Artifacts',
-  description: 'Browse our exclusive collection of energized spell jars, healing crystals, tarot decks, and spiritual jewelry designed to attract love, money, and protection.',
-};
-
-// --- NEW: Define the limit at the top level ---
 const ABSOLUTE_MAX_PRICE = 1000;
 
 // ==========================================
@@ -33,12 +34,21 @@ export default async function ShopPage({ searchParams }) {
   const params = await searchParams;
   
   const currentCategory = params.category ? decodeURIComponent(params.category) : 'all';
-  // Use ABSOLUTE_MAX_PRICE as the fallback default
   const currentMaxPrice = params.maxPrice ? Number(params.maxPrice) : ABSOLUTE_MAX_PRICE; 
   const searchQuery = params.q || "";
 
-  const categories = ['All', 'Spell Jars', 'Oils', 'Crystals', 'Spray', 'Jewellery', 'Bath Salts', 'Other'];
   const showCategoryPrompt = currentCategory === 'all' && !searchQuery;
+
+  // --- NEW: Category Cards Array with High-Quality Placeholders ---
+  const categoryCards = [
+    { name: 'Spell Jars', image: spellJar.src },
+    { name: 'Oils', image: oil.src },
+    { name: 'Crystals', image: crystal.src },
+    { name: 'Spray', image: Spray.src },
+    { name: 'Jewellery', image: bracelets.src },
+    { name: 'Bath Salts', image: bathSalt.src },
+    { name: 'Other', image: 'https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?q=80&w=600&auto=format&fit=crop' }
+  ];
 
   const featuredProducts = await Product.find({ isFeatured: true }).lean();
   const allProductsForSearch = await Product.find({}, { name: 1, images: 1, category: 1, price: 1 }).lean();
@@ -64,7 +74,6 @@ export default async function ShopPage({ searchParams }) {
           <MobileFilterWrapper>
             {currentCategory !== 'all' && (
               <div className="mb-8">
-                {/* --- NEW: Reset to absolute max when going back --- */}
                 <Link 
                   href={`/shop?maxPrice=${ABSOLUTE_MAX_PRICE}`}
                   className="flex items-center justify-center md:justify-start gap-3 text-sm font-medium text-zinc-300 hover:text-purple-400 transition-colors bg-zinc-900/50 px-5 py-3 rounded-xl border border-zinc-800 hover:border-purple-500/50 w-full shadow-sm"
@@ -90,25 +99,41 @@ export default async function ShopPage({ searchParams }) {
             </div>
 
             {showCategoryPrompt ? (
-              <div className="flex flex-col items-center justify-center py-16 md:py-24 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <Compass className="w-12 h-12 text-purple-500 mb-6 opacity-80" />
-                <h2 className="text-3xl md:text-4xl font-serif tracking-wide text-zinc-100 uppercase mb-4 flex items-center gap-3">
+              <div className="flex flex-col items-center justify-center py-10 md:py-16 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Compass className="w-10 h-10 text-purple-500 mb-6 opacity-80" />
+                <h2 className="text-3xl md:text-4xl font-serif tracking-wide text-zinc-100 uppercase mb-4">
                   Explore Our Realms
                 </h2>
                 <p className="text-zinc-400 mb-12 max-w-lg mx-auto text-lg">
                   Select a category to view our mystical artifacts and offerings.
                 </p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-2xl">
-                  {categories.filter(c => c !== 'All').map(cat => (
+                
+                {/* --- NEW: Beautiful Image Category Cards Grid --- */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl mx-auto">
+                  {categoryCards.map(cat => (
                     <Link
-                      key={cat}
-                      // --- NEW: Reset to absolute max when clicking a new category ---
-                      href={`/shop?category=${cat.toLowerCase()}&maxPrice=${ABSOLUTE_MAX_PRICE}`}
-                      className="p-6 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-purple-500 hover:bg-purple-500/10 transition-all duration-300 flex flex-col items-center justify-center group shadow-md"
+                      key={cat.name}
+                      href={`/shop?category=${cat.name.toLowerCase()}&maxPrice=${ABSOLUTE_MAX_PRICE}`}
+                      className="group relative flex flex-col items-center justify-end rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-purple-500 transition-all duration-500 shadow-md hover:shadow-purple-900/20 aspect-[4/5] sm:aspect-square"
                     >
-                      <span className="text-zinc-300 group-hover:text-purple-300 font-medium tracking-wide text-center">
-                        {cat}
-                      </span>
+                      {/* Background Image */}
+                      <Image 
+                        src={cat.image} 
+                        alt={cat.name} 
+                        fill 
+                        className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-40" 
+                        unoptimized 
+                      />
+                      
+                      {/* Dark Gradient Overlay for Text Readability */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+                      
+                      {/* Category Title */}
+                      <div className="relative z-10 w-full p-5 text-center">
+                        <span className="text-zinc-100 group-hover:text-purple-300 font-serif text-xl md:text-2xl tracking-wide drop-shadow-lg transition-colors">
+                          {cat.name}
+                        </span>
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -139,7 +164,6 @@ async function ProductGrid({ currentCategory, currentMaxPrice, searchQuery }) {
   if (searchQuery) query.name = { $regex: searchQuery, $options: "i" };
   if (currentCategory !== 'all') query.category = { $regex: new RegExp(`^${currentCategory}$`, "i") };
   
-  // --- NEW: Only limit the database if the user hasn't dragged it to the absolute max! ---
   if (currentMaxPrice < ABSOLUTE_MAX_PRICE) {
     query.price = { $lte: currentMaxPrice };
   }
