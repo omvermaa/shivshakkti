@@ -216,6 +216,22 @@ export default function ProductManager({ initialProducts }) {
                     className="bg-zinc-900 border-zinc-800"
                   />
                 </div>
+                {/* --- NEW: Discount Input --- */}
+                <div className="space-y-2">
+                  <Label htmlFor="discountedPrice">Discounted Price (₹)</Label>
+                  <Input
+                    id="discountedPrice"
+                    name="discountedPrice"
+                    type="number"
+                    // If editing an old product without a discount, it falls back to the regular price
+                    defaultValue={
+                      editingProduct?.discountedPrice || editingProduct?.price
+                    }
+                  />
+                  <p className="text-xs text-zinc-500">
+                    Leave equal to regular price to hide the discount slash.
+                  </p>
+                </div>
                 <div className="space-y-2">
                   <Label className="text-zinc-300">Stock Quantity</Label>
                   <Input

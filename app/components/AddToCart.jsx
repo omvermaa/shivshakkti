@@ -71,7 +71,6 @@ export default function AddToCart({ productId, stock }) {
             <Plus className="w-4 h-4" />
           </button>
         </div>
-        <span className="text-xs text-zinc-500">({stock} available)</span>
       </div>
 
       {/* Action Buttons */}
