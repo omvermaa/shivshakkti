@@ -90,7 +90,7 @@ export default function ProductReviewsCarousel({ productName }) {
                 </div>
 
                 <p className="text-zinc-300 text-sm leading-relaxed mb-6 italic">
-                  "{review.text}"
+                  {review.text}
                 </p>
 
                 <div className="flex items-center gap-3 mt-auto">
