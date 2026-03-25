@@ -65,16 +65,27 @@ export default function LandingClient() {
           onClick={() => setIsRevealed(true)}
           className="flex flex-col items-center w-full gap-6 px-2 transition-transform duration-500 focus:outline-none"
         >
-          <div className="w-56 h-56 md:w-64 md:h-64 bg-transparent border-[1px] border-white/20 rounded-full flex flex-col items-center justify-center pointer-events-auto cursor-pointer hover:border-white/50 transition-all duration-500 hover:scale-105">
+          <motion.div 
+            className="relative w-56 h-56 md:w-72 md:h-72 bg-transparent rounded-full flex flex-col items-center justify-center pointer-events-auto cursor-pointer"
+            animate={{ scale: [1, 1.03, 1] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            whileHover={{ scale: 1.08 }}
+          >
             <img
               src={logoImage.src}
               alt="ShivShakti Tarot"
-              className="w-44 h-44 md:w-64 md:h-64 rounded-full object-cover border-2 border-primary/30 cursor-default"
+              className="w-full h-full rounded-full object-cover cursor-default"
               style={{
-                boxShadow: "var(--shadow-heavy)",
+                maskImage: "radial-gradient(circle at center, black 35%, transparent 70%)",
+                WebkitMaskImage: "radial-gradient(circle at center, black 35%, transparent 70%)",
               }}
             />
-          </div>
+            {/* Front layer of dark clouds/fog to hide the sharp edges */}
+            <div 
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ background: "radial-gradient(circle at center, transparent 40%, rgba(26,26,26,0.85) 65%, rgba(26,26,26,1) 100%)" }}
+            ></div>
+          </motion.div>
 
           <h1 className="text-3xl md:text-3xl tracking-[0.1em] md:tracking-[0.2em] text-white uppercase drop-shadow-lg text-center px-0 md:px-4 w-full">
             ShivShakkti
@@ -188,18 +199,24 @@ export const Index = () => {
             style={{ transformStyle: "preserve-3d" }}
           >
             <motion.div
-              className="animate-pulse-glow"
-              whileHover={{ scale: 1.03 }}
-              transition={{ duration: 0.5, ease: brandEase }}
+              className="relative animate-pulse-glow rounded-full"
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              whileHover={{ scale: 1.08 }}
             >
               <img
                 src={logoImage.src}
                 alt="ShivShakti Tarot"
-                className="w-48 h-48 md:w-64 md:h-64 rounded-full object-cover border-2 border-primary/30"
+                className="w-48 h-48 md:w-64 md:h-64 rounded-full object-cover"
                 style={{
-                  boxShadow: "var(--shadow-heavy)",
+                  maskImage: "radial-gradient(circle at center, black 35%, transparent 70%)",
+                  WebkitMaskImage: "radial-gradient(circle at center, black 35%, transparent 70%)",
                 }}
               />
+              <div 
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{ background: "radial-gradient(circle at center, transparent 40%, rgba(26,26,26,0.85) 65%, rgba(26,26,26,1) 100%)" }}
+              ></div>
             </motion.div>
             <motion.p
               className="text-muted-foreground uppercase tracking-widest text-xs"
@@ -232,11 +249,14 @@ export const Index = () => {
             <motion.img
               src={logoImage.src}
               alt="ShivShakti Tarot"
-              className="w-20 h-20 rounded-full object-cover border border-primary/30"
+              className="w-20 h-20 rounded-full object-cover"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.8, ease: brandEase }}
-              style={{ boxShadow: "var(--shadow-heavy)" }}
+              style={{ 
+                maskImage: "radial-gradient(circle, black 50%, transparent 100%)",
+                WebkitMaskImage: "radial-gradient(circle, black 50%, transparent 100%)",
+              }}
             />
 
             {/* Tagline */}
@@ -647,15 +667,27 @@ export function Landing() {
             Click the Logo
           </p>
           <div className="relative" style={{ width: "clamp(165px, 19vw, 235px)", height: "auto", aspectRatio: "1 / 1" }}>
-            <Image
-              src={logoImage}
-              alt="ShivShakti Tarot"
-              fill
-              className="relative aspect-square rounded-full object-contain"
-              style={{ transition: "transform 0.5s" }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-            />
+            <motion.div 
+              className="relative w-full h-full rounded-full overflow-hidden"
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              whileHover={{ scale: 1.08 }}
+            >
+              <Image
+                src={logoImage}
+                alt="ShivShakti Tarot"
+                fill
+                className="object-cover"
+                style={{ 
+                    maskImage: "radial-gradient(circle at center, black 35%, transparent 70%)",
+                    WebkitMaskImage: "radial-gradient(circle at center, black 35%, transparent 70%)",
+                }}
+              />
+              <div 
+                className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{ background: "radial-gradient(circle at center, transparent 40%, rgba(15,23,42,0.85) 65%, rgba(15,23,42,1) 100%)" }}
+              ></div>
+            </motion.div>
           <p className="absolute top-72" style={{ fontFamily: "Georgia, serif", letterSpacing: "0.35em", color: "#d1d5db", fontSize: "0.85rem", fontWeight: 600, textTransform: "uppercase"}}>
             ShivShakti Tarot
           </p>

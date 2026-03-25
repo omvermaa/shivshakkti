@@ -132,7 +132,9 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
       return;
     }
 
-    const orderResponse = await createRazorpayOrder(totalAmount);
+    // --- NEW: Pass formData to the server action! ---
+    const orderResponse = await createRazorpayOrder(totalAmount, formData);
+    
     if (!orderResponse.success) {
       alert("Failed to create order: " + orderResponse.error);
       setIsProcessing(false);
@@ -146,6 +148,10 @@ export default function CheckoutForm({ cart, user, totalAmount, razorpayKeyId })
       name: "ShivShakkti Tarot",
       description: "Mystical Items Purchase",
       order_id: orderResponse.order.id,
+      
+      // --- NEW: Inject the linked Customer ID into the checkout modal ---
+      customer_id: orderResponse.customerId,
+      
       prefill: {
         name: formData.name,
         email: user?.email || "",

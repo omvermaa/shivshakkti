@@ -41,14 +41,14 @@ export default function PriceFilter({ initialPrice }) {
         value={price}
         onValueChange={setPrice}          // Updates the ₹ text instantly while dragging
         onValueCommit={handleValueCommit} // Triggers the actual database filter when released
-        max={5000} 
-        step={200}
+        max={1000} 
+        step={100}
         className="w-full cursor-grab active:cursor-grabbing"
       />
       
       <div className="flex justify-between text-xs text-zinc-500 font-medium">
         <span>₹0</span>
-        <span>₹5,000+</span>
+        <span>₹1,000+</span>
       </div>
     </div>
   );

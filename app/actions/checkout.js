@@ -5,7 +5,7 @@ import crypto from "crypto";
 import { connectMongoDB } from "../lib/mongodb";
 import Order from "../models/Order";
 import User from "../models/User";
-import Product from "../models/Product"; // <-- NEW: Imported Product model
+import Product from "../models/Product"; 
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
@@ -16,22 +16,49 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// 1. Create a Razorpay Order
-export async function createRazorpayOrder(amount) {
+// 1. Create a Razorpay Customer & Order
+// 1. Create a Razorpay Customer & Order
+export async function createRazorpayOrder(amount, customerDetails) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) throw new Error("User not logged in");
+
+    // --- NEW: Format the address into a readable string ---
+    const fullAddress = `${customerDetails.street}, ${customerDetails.city}, ${customerDetails.state} - ${customerDetails.zipCode}, ${customerDetails.country}`;
+
+    // --- NEW: Inject the address into the Customer's "notes" ---
+    const customer = await razorpay.customers.create({
+      name: customerDetails.name,
+      email: session.user.email,
+      contact: customerDetails.phone,
+      fail_existing: 0,
+      notes: {
+        "Shipping Address": fullAddress
+      }
+    });
+
+    // --- NEW: Inject the address into the Order's "notes" ---
     const options = {
       amount: Math.round(amount * 100), 
       currency: "INR",
       receipt: `receipt_${Date.now()}`,
+      customer_id: customer.id, 
+      notes: {
+        "Shipping Address": fullAddress
+      }
     };
     
     const order = await razorpay.orders.create(options);
-    return { success: true, order };
+    
+    return { success: true, order, customerId: customer.id };
   } catch (error) {
     console.error("Razorpay order error:", error);
     return { success: false, error: error.message };
   }
 }
+
+// 2. Verify Signature and Save to Database
+// ... keep the rest of your verifyAndSaveOrder function EXACTLY the same ...
 
 // 2. Verify Signature and Save to Database
 export async function verifyAndSaveOrder(paymentData, shippingDetails, cartItems, totalAmount) {
@@ -100,7 +127,7 @@ export async function verifyAndSaveOrder(paymentData, shippingDetails, cartItems
     revalidatePath("/shop"); // Refresh shop grid
     revalidatePath("/", "layout");
 
-    return { success: true, orderId: newOrder._id };
+    return { success: true, orderId: newOrder._id.toString() };
   } catch (error) {
     console.error("Order save error:", error);
     return { success: false, error: error.message };

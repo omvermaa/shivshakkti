@@ -1,13 +1,20 @@
 "use client";
 
 import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay"; // <-- NEW: Imported Autoplay
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Sparkles, ArrowRight } from "lucide-react";
 
 export default function FeaturedCarousel({ featuredProducts }) {
-  const [emblaRef] = useEmblaCarousel({ loop: true, align: "start" });
+  // --- NEW: Added Autoplay to the hook array ---
+  // delay: 3500 means it swipes every 3.5 seconds
+  // stopOnInteraction: false keeps it playing even after the user touches it
+  const [emblaRef] = useEmblaCarousel(
+    { loop: true, align: "start" },
+    [Autoplay({ delay: 2000, stopOnInteraction: false })] 
+  );
 
   if (!featuredProducts || featuredProducts.length === 0) return null;
 
