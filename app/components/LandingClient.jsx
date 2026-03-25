@@ -104,10 +104,10 @@ export default function LandingClient() {
         </div>
 
         {/* Bottom Action Buttons */}
-        <div className="absolute flex flex-row mb-10 items-center justify-center w-full gap-1 sm:gap-4 md:gap-8 px-0 sm:px-4 md:px-8 bottom-8 md:bottom-16">
+        <div className="absolute mx-5 flex flex-row mb-10 items-center justify-center w-full gap-1 sm:gap-4 md:gap-8 px-0 sm:px-4 md:px-8 bottom-8 md:bottom-16">
           <Link
             href="/shop"
-            className="flex-1 md:flex-none px-0 py-3 sm:px-8 sm:py-4 md:py-3 text-full md:text-base font-semibold tracking-wider sm:tracking-widest text-white uppercase transition-all duration-300 border rounded-[30px] bg-black/30 border-white/40 backdrop-blur-md hover:bg-white/20 hover:border-white text-center whitespace-nowrap"
+            className="flex-1 mx-1 md:flex-none px-0 py-3 sm:px-8 sm:py-4 md:py-3 text-full md:text-base font-semibold tracking-wider sm:tracking-widest text-white uppercase transition-all duration-300 border rounded-[30px] bg-black/30 border-white/40 backdrop-blur-md hover:bg-white/20 hover:border-white text-center whitespace-nowrap"
           >
             Shop Online
           </Link>
@@ -126,7 +126,7 @@ export default function LandingClient() {
 
           <Link
             href="/services"
-            className="flex-1 md:flex-none px-0 py-3 sm:px-8 sm:py-4 md:py-3 text-full md:text-base font-semibold tracking-wider sm:tracking-widest text-white uppercase transition-all duration-300 border rounded-[30px] bg-black/30 border-white/40 backdrop-blur-md hover:bg-white/20 hover:border-white text-center whitespace-nowrap"
+            className="flex-1 mx-1 md:flex-none px-0 py-3 sm:px-8 sm:py-4 md:py-3 text-full md:text-base font-semibold tracking-wider sm:tracking-widest text-white uppercase transition-all duration-300 border rounded-[30px] bg-black/30 border-white/40 backdrop-blur-md hover:bg-white/20 hover:border-white text-center whitespace-nowrap"
           >
             Book Session
           </Link>
