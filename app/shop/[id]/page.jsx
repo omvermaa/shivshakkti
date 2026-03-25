@@ -11,6 +11,45 @@ import { Badge } from "../../components/ui/badge";
 import { Card, CardContent } from "../../components/ui/card"; // <-- NEW: Reusing the card UI
 import { Truck, ShieldCheck, Tag, Sparkles } from "lucide-react"; // <-- NEW: Added Sparkles icon
 
+// --- NEW: Generate Dynamic SEO for each specific product! ---
+export async function generateMetadata({ params }) {
+  const resolvedParams = await params;
+  
+  // We need a lightweight connection just to fetch the name and description
+  await connectMongoDB();
+  const product = await Product.findById(resolvedParams.id).select('name description images category').lean();
+
+  if (!product) {
+    return {
+      title: 'Product Not Found',
+      description: 'The mystical item you are looking for has vanished.'
+    };
+  }
+
+  // Create a clean, short description for Google (max 160 chars is best practice)
+  const cleanDescription = product.description.replace(/\r\n/g, ' ').substring(0, 155) + '...';
+
+  return {
+    title: product.name,
+    description: cleanDescription,
+    category: product.category,
+    openGraph: {
+      title: `${product.name} | ShivShakkti Tarot`,
+      description: cleanDescription,
+      url: `https://shivshakkti.vercel.app/shop/${product._id}`,
+      images: [
+        {
+          url: product.images[0] || '/placeholder-product.jpg', // Shows the exact product image in WhatsApp/iMessage!
+          width: 800,
+          height: 800,
+          alt: product.name,
+        },
+      ],
+      type: 'article', // Helps search engines understand this is a specific item
+    },
+  };
+}
+
 export default async function ProductPage({ params }) {
   await connectMongoDB();
 
