@@ -59,36 +59,36 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">Total Revenue</CardTitle>
+            <CardTitle className="font-medium text-zinc-400">Total Revenue</CardTitle>
             <IndianRupee className="w-4 h-4 text-purple-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-zinc-100">
               ₹{totalRevenue.toLocaleString('en-IN')}
             </div>
-            <p className="text-xs text-zinc-500 mt-1">From {validOrders.length} successful orders</p>
+            <p className="text-sm text-zinc-500 mt-1">From {validOrders.length} successful orders</p>
           </CardContent>
         </Card>
         
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">Active Orders</CardTitle>
+            <CardTitle className=" font-medium text-zinc-400">Active Orders</CardTitle>
             <ShoppingBag className="w-4 h-4 text-purple-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-zinc-100">{activeOrders.length}</div>
-            <p className="text-xs text-zinc-500 mt-1">{pendingFulfillmentCount} awaiting fulfillment</p>
+            <p className="text-sm text-zinc-500 mt-1">{pendingFulfillmentCount} awaiting fulfillment</p>
           </CardContent>
         </Card>
 
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">Total Products</CardTitle>
+            <CardTitle className="font-medium text-zinc-400">Total Products</CardTitle>
             <PackageOpen className="w-4 h-4 text-purple-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-zinc-100">{totalProductsCount}</div>
-            <p className="text-xs text-zinc-500 mt-1">Across {uniqueCategoriesCount} categories</p>
+            <p className="text-sm text-zinc-500 mt-1">Across {uniqueCategoriesCount} categories</p>
           </CardContent>
         </Card>
       </div>
