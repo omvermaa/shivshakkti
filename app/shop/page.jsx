@@ -15,11 +15,7 @@ import oil from "@/app/assets/oils.webp";
 import crystal from "@/app/assets/crystals.webp";
 import bracelets from "@/app/assets/bracelets.webp";
 import bathSalt from "@/app/assets/bathsalts.webp";
-import r1 from "@/app/assets/r1.jpg";
-import r2 from "@/app/assets/r2.jpg";
-import r3 from "@/app/assets/r3.jpg";
-import r4 from "@/app/assets/r4.jpg";
-import r5 from "@/app/assets/r5.jpg";
+import ReviewImageCarousel from "../components/ReviewImageCarousel";
 
 import { connectMongoDB } from "../lib/mongodb";
 import Product from "../models/Product";
@@ -162,6 +158,7 @@ export default async function ShopPage({ searchParams }) {
             )}
           </main>
         </div>
+        <ReviewImageCarousel />
       </div>
     </div>
   );
