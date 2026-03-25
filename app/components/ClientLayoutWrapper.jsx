@@ -7,21 +7,20 @@ import Footer from "./Footer";
 export default function ClientLayoutWrapper({ children }) {
   const pathname = usePathname();
 
-  // Hide Navbar and Footer if the user is on the Landing Page ("/")
-  const isLandingPage = pathname === "/";
+  // Foolproof check: catches the root exactly, avoiding trailing slash bugs
+  const isLandingPage = pathname === "/" || pathname === "";
 
-  // Optional: You can also add your admin paths here if you want to hide the public footer on admin dashboards!
-  // const isLandingPage = pathname === "/" || pathname.startsWith("/admin");
+  // This ensures Navbar and Footer stay completely hidden on the Landing page
+  if (isLandingPage) {
+    return <main className="flex-grow">{children}</main>;
+  }
 
+  // Renders normally for /shop, /about, /services, etc.
   return (
     <>
-      {!isLandingPage && <Navigation />}
-      
-      <main className="flex-grow">
-        {children}
-      </main>
-
-      {!isLandingPage && <Footer />}
+      <Navigation />
+      <main className="flex-grow">{children}</main>
+      <Footer />
     </>
   );
 }
