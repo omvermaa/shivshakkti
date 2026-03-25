@@ -5,14 +5,16 @@ import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { ShoppingBag, Zap, Plus, Minus, Loader2 } from "lucide-react";
 import { addToCart } from "../actions/cart";
-import { toast } from "sonner"; // Using your toaster!
+import { toast } from "sonner"; 
 
 export default function AddToCart({ product }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
+  
+  // Two separate loading states so the buttons animate independently
   const [isAdding, setIsAdding] = useState(false);
+  const [isBuying, setIsBuying] = useState(false); 
 
-  // --- CRITICAL FIX: Force stock to be a pure number to prevent math bugs ---
   const stockAvailable = Number(product.stock) || 0;
 
   const increaseQuantity = () => {
@@ -29,6 +31,7 @@ export default function AddToCart({ product }) {
     }
   };
 
+  // Standard Add to Cart (Stays on the page)
   const handleAddToCart = async () => {
     setIsAdding(true);
     try {
@@ -36,8 +39,6 @@ export default function AddToCart({ product }) {
       
       if (res.success) {
         toast.success("Added to your realm successfully!");
-        
-        // This fires the event your CartDrawer uses to update the UI instantly!
         window.dispatchEvent(new Event("cartUpdated")); 
       } else {
         if (res.error === "Not logged in") {
@@ -54,8 +55,32 @@ export default function AddToCart({ product }) {
     }
   };
 
-  const handleBuyNow = () => {
-    router.push(`/checkout?product=${product._id}&quantity=${quantity}`);
+  // --- UPDATED: Buy It Now Logic ---
+  const handleBuyNow = async () => {
+    setIsBuying(true);
+    try {
+      // 1. Instantly push the item into the user's database cart
+      const res = await addToCart(product._id, quantity);
+      
+      if (res.success) {
+        // 2. Update the navbar cart counter
+        window.dispatchEvent(new Event("cartUpdated")); 
+        
+        // 3. Immediately redirect to standard checkout
+        router.push(`/checkout`); 
+      } else {
+        if (res.error === "Not logged in") {
+           toast.error("Please log in to purchase.");
+           router.push("/user-login");
+        } else {
+           toast.error(res.error || "Failed to initiate purchase.");
+        }
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred.");
+    } finally {
+      setIsBuying(false);
+    }
   };
 
   if (stockAvailable <= 0) {
@@ -68,7 +93,6 @@ export default function AddToCart({ product }) {
 
   return (
     <div className="space-y-6">
-      {/* Quantity Selector */}
       <div className="flex items-center gap-4">
         <span className="text-zinc-400 text-sm font-medium">Quantity:</span>
         <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-full p-1">
@@ -92,22 +116,22 @@ export default function AddToCart({ product }) {
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-4">
         <Button 
           onClick={handleAddToCart}
-          disabled={isAdding}
-          className="flex-1 rounded-2xl bg-zinc-900 text-lg hover:bg-zinc-800 text-white border border-zinc-700 py-4"
+          disabled={isAdding || isBuying}
+          className="flex-1 rounded-2xl text-lg bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 py-4"
         >
           {isAdding ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ShoppingBag className="w-4 h-4 mr-2" />}
           {isAdding ? "Adding..." : "Add to Cart"}
         </Button>
         <Button 
           onClick={handleBuyNow}
-          className="flex-1 bg-purple-600 rounded-2xl text-lg hover:bg-purple-700 text-white py-4 shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_25px_rgba(147,51,234,0.5)] transition-all"
+          disabled={isAdding || isBuying}
+          className="flex-1 rounded-2xl text-lg bg-purple-600 hover:bg-purple-700 text-white py-4 shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_25px_rgba(147,51,234,0.5)] transition-all"
         >
-          <Zap className="w-4 h-4 mr-2 fill-current" />
-          Buy it Now
+          {isBuying ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Zap className="w-4 h-4 mr-2 fill-current" />}
+          {isBuying ? "Processing..." : "Buy it Now"}
         </Button>
       </div>
     </div>
