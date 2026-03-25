@@ -3,6 +3,12 @@ import Link from "next/link";
 import { Instagram, Sparkles, Moon, Sun } from "lucide-react";
 import aboutImage from "./about.jpg";
 
+// --- NEW: SEO Metadata ---
+export const metadata = {
+  title: "About Us | ShivShakkti Tarot",
+  description: "Bridging the gap between the physical and the spiritual. Discover our philosophy, energy work, and intentionally selected mystical items.",
+};
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-zinc-950 pt-32 pb-20 px-6 lg:px-12 text-zinc-50">
@@ -39,7 +45,7 @@ export default function AboutPage() {
                 Our Philosophy
               </h2>
               <p className="text-zinc-400 leading-relaxed">
-                The name "ShivShakkti" represents the ultimate cosmic balance. Shiv is the pure consciousness, and Shakti is the dynamic energy that breathes life into the universe. Together, they form the foundation of our spiritual practice.
+                The name ShivShakkti represents the ultimate cosmic balance. Shiv is the pure consciousness, and Shakti is the dynamic energy that breathes life into the universe. Together, they form the foundation of our spiritual practice.
               </p>
               <p className="text-zinc-400 leading-relaxed">
                 Whether you are seeking answers about love, career, or your spiritual path, our readings and carefully curated mystical items are designed to align your personal energy with the universe.

@@ -3,6 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { PhoneCall, Video, Clock, Sparkles, MessageCircle, CalendarHeart } from "lucide-react";
 
+// --- NEW: SEO Metadata ---
+export const metadata = {
+  title: "Tarot & Astrology Readings | ShivShakkti Tarot",
+  description: "Book personalized voice and video tarot readings. Gain clarity, uncover hidden truths, and align with your cosmic path.",
+};
+
 export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-zinc-950 pt-32 pb-20 px-6 lg:px-12 text-zinc-50">
