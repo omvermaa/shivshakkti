@@ -128,7 +128,7 @@ export default function ServicesPage() {
 
           {/* ⚠️ UPDATE THIS PHONE NUMBER ⚠️ */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/919211929837" target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white w-full sm:w-auto h-14 px-8 text-lg rounded-full shadow-lg shadow-emerald-900/20 gap-3">
                 <MessageCircle className="w-5 h-5" />
                 WhatsApp Us
