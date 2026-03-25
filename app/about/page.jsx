@@ -2,6 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Instagram, Sparkles, Moon, Sun } from "lucide-react";
 import aboutImage from "./about.jpg";
+import r1 from "@/app/assets/r1.jpg";
+import r2 from "@/app/assets/r2.jpg";
+import r3 from "@/app/assets/r3.jpg";
+import r4 from "@/app/assets/r4.jpg";
+import r5 from "@/app/assets/r5.jpg";
 
 // --- NEW: SEO Metadata ---
 export const metadata = {

@@ -6,18 +6,17 @@ import Image from "next/image";
 import { Star } from "lucide-react";
 
 export default function ProductReviewsCarousel({ productName }) {
-  // Autoplays every 4 seconds, keeps playing even if user clicks
   const [emblaRef] = useEmblaCarousel(
     { loop: true, align: "start" },
     [Autoplay({ delay: 4000, stopOnInteraction: false })] 
   );
 
-  // Dynamic reviews that inject the actual product name
   const reviews = [
     {
       id: 1,
       name: "Priya Sharma",
-      avatar: "https://randomuser.me/api/portraits/women/43.jpg",
+      // Authentic Indian Woman Portrait
+      avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&auto=format&fit=crop",
       text: `I recently received my ${productName} and the energy is just beautiful. It genuinely feels so pure and perfectly aligned with my intentions!`,
       rating: 5,
       date: "2 weeks ago"
@@ -25,15 +24,17 @@ export default function ProductReviewsCarousel({ productName }) {
     {
       id: 2,
       name: "Rahul Verma",
-      avatar: "https://randomuser.me/api/portraits/men/22.jpg",
-      text: `The packaging was incredibly secure and full of positive vibes. The ${productName} looks even more stunning in person. Highly recommend this shop!`,
-      rating: 5,
+      // Blank Profile Avatar (RV)
+      avatar: "https://ui-avatars.com/api/?name=Rahul+Verma&background=27272a&color=a1a1aa",
+      text: `The packaging was incredibly secure. The ${productName} looks stunning in person. Giving 4 stars only because delivery took a day longer than I expected.`,
+      rating: 4, 
       date: "1 month ago"
     },
     {
       id: 3,
       name: "Ananya Kapoor",
-      avatar: "https://randomuser.me/api/portraits/women/20.jpg",
+      // Authentic Indian Woman Portrait (Updated valid link)
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&auto=format&fit=crop",
       text: `Absolutely in love with it. You can actually feel the intention and positivity put into the ${productName}. Will definitely be ordering more items soon.`,
       rating: 5,
       date: "3 weeks ago"
@@ -41,16 +42,18 @@ export default function ProductReviewsCarousel({ productName }) {
     {
       id: 4,
       name: "Vikram Desai",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      text: `Beautiful craftsmanship and powerful energy. The ${productName} exactly matches the description. Delivery was also faster than expected!`,
-      rating: 5,
+      // Blank Profile Avatar (VD)
+      avatar: "https://ui-avatars.com/api/?name=Vikram+Desai&background=27272a&color=a1a1aa",
+      text: `The energy of the ${productName} is good, but it is slightly smaller than I imagined from the pictures. Still a very nice and authentic piece.`,
+      rating: 3,
       date: "2 months ago"
     },
     {
       id: 5,
       name: "Kavya Menon",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      text: `I've bought a few mystical items online before, but the ${productName} is by far my favorite. The quality is unmatched. Thank you so much!`,
+      // Authentic Indian Woman Portrait
+      avatar: "https://images.unsplash.com/photo-1558898479-33c0057a5d12?w=200&h=200&auto=format&fit=crop",
+      text: `I've bought a few mystical items online before, but the quality here is unmatched. The ${productName} exactly matches the description. Thank you!`,
       rating: 5,
       date: "1 week ago"
     }
@@ -74,24 +77,24 @@ export default function ProductReviewsCarousel({ productName }) {
             >
               <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 h-full flex flex-col justify-between hover:border-purple-500/30 transition-colors shadow-sm">
                 
-                {/* Stars & Date */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex gap-1">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-purple-500 text-purple-500" />
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={`w-4 h-4 ${i < review.rating ? 'fill-purple-500 text-purple-500' : 'fill-zinc-800 text-zinc-700'}`} 
+                      />
                     ))}
                   </div>
                   <span className="text-xs text-zinc-500">{review.date}</span>
                 </div>
 
-                {/* Review Text */}
                 <p className="text-zinc-300 text-sm leading-relaxed mb-6 italic">
                   "{review.text}"
                 </p>
 
-                {/* Customer Profile */}
                 <div className="flex items-center gap-3 mt-auto">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden border border-zinc-700">
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden border border-zinc-700 bg-zinc-800">
                     <Image 
                       src={review.avatar} 
                       alt={review.name} 
