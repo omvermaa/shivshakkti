@@ -39,7 +39,8 @@ export async function addToCart(productId, quantity = 1) {
     
     if (!user) return { success: false, error: "User not found" };
 
-    const cartItemIndex = user.cart.findIndex(item => item.product.toString() === productId);
+    const cartItemIndex = user.cart.findIndex(item => item.product?.toString() === productId);
+    // const cartItemIndex = user.cart.findIndex(item => item.product && item.product.toString() === productId);
 
     if (cartItemIndex > -1) {
       // Item exists, just update the quantity
