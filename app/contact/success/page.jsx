@@ -1,0 +1,51 @@
+import Link from "next/link";
+import { CheckCircle2, Home, Sparkles } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+
+export default function ContactSuccessPage() {
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-32 pb-12 px-6 flex flex-col items-center justify-center relative overflow-hidden">
+      
+      <div className="max-w-md w-full z-10 animate-in fade-in zoom-in duration-500">
+        <Card className="bg-zinc-900 border-zinc-800 shadow-2xl shadow-purple-900/20 overflow-hidden relative">
+          
+          {/* Subtle glowing background effect */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-32 bg-purple-500/10 blur-[50px] rounded-full pointer-events-none" />
+
+          <CardContent className="pt-10 pb-8 px-8 flex flex-col items-center text-center relative z-10">
+            
+            {/* Animated Checkmark */}
+            <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-4 border-emerald-500/20 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+              <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+            </div>
+            
+            <h1 className="text-2xl md:text-3xl font-serif text-zinc-100 tracking-wide mb-3">
+              Message Received!
+            </h1>
+            
+            <p className="text-zinc-400 mb-8 leading-relaxed">
+              Thank you for reaching out. Your message has safely crossed into our realm, and we will connect with you shortly.
+            </p>
+
+            {/* Action Buttons */}
+            <div className="w-full space-y-3">
+              <Link href="/shop" className="w-full block">
+                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white h-12 text-md gap-2">
+                  <Sparkles className="w-4 h-4" /> Continue Exploring
+                </Button>
+              </Link>
+              
+              <Link href="/" className="w-full block">
+                <Button variant="outline" className="w-full border-zinc-700 hover:bg-zinc-800 text-zinc-300 h-12 text-md gap-2">
+                  <Home className="w-4 h-4" /> Return to Home
+                </Button>
+              </Link>
+            </div>
+
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
