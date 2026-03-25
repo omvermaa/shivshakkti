@@ -41,8 +41,8 @@ export default function ProductManager({ initialProducts }) {
   const [searchQuery, setSearchQuery] = useState("");
 
   // State for images
-  const [existingImages, setExistingImages] = useState([]); // URLs already in MongoDB
-  const [newFiles, setNewFiles] = useState([]); // Raw File objects to upload
+  const [existingImages, setExistingImages] = useState([]); 
+  const [newFiles, setNewFiles] = useState([]); 
 
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -76,12 +76,10 @@ export default function ProductManager({ initialProducts }) {
     setExistingImages(existingImages.filter((_, i) => i !== index));
   };
 
-  // Helper to upload a single file to Cloudinary
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
 
-    // ⚠️ REPLACE THESE WITH YOUR CLOUDINARY DETAILS ⚠️
     formData.append("upload_preset", "shivshakkti_preset");
     const cloudName = "dxgvwi4uu";
 
@@ -110,20 +108,15 @@ export default function ProductManager({ initialProducts }) {
         submitData.append("id", editingProduct._id);
       }
 
-      // 1. Upload all NEW files to Cloudinary first
       const uploadedUrls = [];
       for (const file of newFiles) {
         const url = await uploadToCloudinary(file);
         if (url) uploadedUrls.push(url);
       }
 
-      // 2. Combine kept existing images with the newly uploaded ones
       const finalImages = [...existingImages, ...uploadedUrls];
-
-      // 3. Append as a stringified array for the server action to parse
       submitData.append("images", JSON.stringify(finalImages));
 
-      // 4. Send to database
       const res = await saveProduct(submitData);
 
       if (res.success) {
@@ -204,9 +197,10 @@ export default function ProductManager({ initialProducts }) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* --- UPDATED: 3-Column Grid for Pricing and Stock --- */}
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-zinc-300">Price (₹)</Label>
+                  <Label className="text-zinc-300">Regular Price (₹)</Label>
                   <Input
                     name="price"
                     type="number"
@@ -216,21 +210,17 @@ export default function ProductManager({ initialProducts }) {
                     className="bg-zinc-900 border-zinc-800"
                   />
                 </div>
-                {/* --- NEW: Discount Input --- */}
                 <div className="space-y-2">
-                  <Label htmlFor="discountedPrice">Discounted Price (₹)</Label>
+                  <Label className="text-zinc-300">Discounted Price (₹)</Label>
                   <Input
-                    id="discountedPrice"
                     name="discountedPrice"
                     type="number"
-                    // If editing an old product without a discount, it falls back to the regular price
-                    defaultValue={
-                      editingProduct?.discountedPrice || editingProduct?.price
-                    }
+                    min="0"
+                    // Fallback to regular price if no discount exists yet
+                    defaultValue={editingProduct?.discountedPrice || editingProduct?.price}
+                    className="bg-zinc-900 border-zinc-800"
+                    placeholder="Optional"
                   />
-                  <p className="text-xs text-zinc-500">
-                    Leave equal to regular price to hide the discount slash.
-                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-zinc-300">Stock Quantity</Label>
@@ -244,8 +234,11 @@ export default function ProductManager({ initialProducts }) {
                   />
                 </div>
               </div>
+              <p className="text-[10px] text-zinc-500 -mt-2">
+                *Leave Discounted Price equal to Regular Price to hide the discount slash on the website.
+              </p>
 
-              <div className="space-y-2">
+              <div className="space-y-2 mt-2">
                 <Label className="text-zinc-300">Category</Label>
                 <select
                   name="category"
@@ -262,24 +255,20 @@ export default function ProductManager({ initialProducts }) {
                 </select>
               </div>
 
-              {/* MULTIPLE IMAGE UPLOAD SECTION */}
               <div className="space-y-3 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800">
                 <Label className="text-zinc-300 flex items-center gap-2">
-                  <ImagePlus className="w-4 h-4 text-purple-400" /> Product
-                  Images
+                  <ImagePlus className="w-4 h-4 text-purple-400" /> Product Images
                 </Label>
                 <Input
                   type="file"
                   accept="image/*"
-                  multiple // Allow multiple files
+                  multiple 
                   onChange={handleFileSelect}
                   className="bg-zinc-950 border-zinc-800 text-zinc-400 file:text-zinc-100 file:bg-zinc-800 file:border-0 file:rounded-md file:px-3 file:py-1 cursor-pointer"
                 />
 
-                {/* Image Preview Grid */}
                 {(existingImages.length > 0 || newFiles.length > 0) && (
                   <div className="flex flex-wrap gap-3 mt-3">
-                    {/* Render Existing DB Images */}
                     {existingImages.map((url, i) => (
                       <div
                         key={`exist-${i}`}
@@ -301,7 +290,6 @@ export default function ProductManager({ initialProducts }) {
                         </button>
                       </div>
                     ))}
-                    {/* Render New Files to Upload */}
                     {newFiles.map((file, i) => (
                       <div
                         key={`new-${i}`}
@@ -330,7 +318,6 @@ export default function ProductManager({ initialProducts }) {
                 )}
               </div>
 
-              {/* --- NEW: Featured Toggle --- */}
               <div className="flex items-center justify-between p-4 bg-zinc-900/80 rounded-xl border border-zinc-800">
                 <div className="space-y-0.5">
                   <Label className="text-zinc-300 font-semibold text-base">
@@ -380,8 +367,7 @@ export default function ProductManager({ initialProducts }) {
                 >
                   {isSaving ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />{" "}
-                      Uploading...
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" /> Uploading...
                     </>
                   ) : editingProduct ? (
                     "Update Product"
@@ -404,9 +390,7 @@ export default function ProductManager({ initialProducts }) {
               <TableHead className="text-zinc-400">Category</TableHead>
               <TableHead className="text-zinc-400">Price</TableHead>
               <TableHead className="text-zinc-400">Stock</TableHead>
-              <TableHead className="text-zinc-400 text-right">
-                Actions
-              </TableHead>
+              <TableHead className="text-zinc-400 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -427,7 +411,6 @@ export default function ProductManager({ initialProducts }) {
                   </div>
                   <div className="flex flex-col">
                     <span>{item.name}</span>
-                    {/* --- NEW: Renders a small badge if the product is featured --- */}
                     {item.isFeatured && (
                       <span className="mt-1 w-max bg-purple-500/20 text-purple-400 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">
                         Featured
@@ -443,7 +426,19 @@ export default function ProductManager({ initialProducts }) {
                     {item.category}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-zinc-300">₹{item.price}</TableCell>
+                
+                {/* --- UPDATED: Shows Admin the Discounted Price dynamically --- */}
+                <TableCell className="text-zinc-300">
+                   {item.discountedPrice && item.discountedPrice < item.price ? (
+                     <div className="flex flex-col">
+                        <span className="text-emerald-400 font-bold">₹{item.discountedPrice}</span>
+                        <span className="text-zinc-500 text-xs line-through">₹{item.price}</span>
+                     </div>
+                   ) : (
+                     `₹${item.price}`
+                   )}
+                </TableCell>
+
                 <TableCell>
                   <span
                     className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${item.stock > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}

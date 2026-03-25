@@ -122,22 +122,26 @@ export default async function ProductPage({ params }) {
                 {product.name}
               </h1>
               {/* --- NEW: Smart Price Display --- */}
-<div className="mt-2 flex items-center gap-2">
-  
-  {/* The Main Price (Shows discount if it exists, otherwise shows regular) */}
-  <p className={`font-semibold ${product.stock > 0 ? 'text-purple-400' : 'text-zinc-500'}`}>
-    ₹{product.discountedPrice && product.discountedPrice < product.price 
-      ? product.discountedPrice 
-      : product.price}
-  </p>
+              <div className="mt-2 text-4xl flex items-center gap-2">
+                {/* The Main Price (Shows discount if it exists, otherwise shows regular) */}
+                <p
+                  className={`font-semibold ${product.stock > 0 ? "text-purple-400" : "text-zinc-500"}`}
+                >
+                  ₹
+                  {product.discountedPrice &&
+                  product.discountedPrice < product.price
+                    ? product.discountedPrice
+                    : product.price}
+                </p>
 
-  {/* The Slash Cut (ONLY renders if discountedPrice is less than regular price) */}
-  {product.discountedPrice && product.discountedPrice < product.price && (
-    <p className="text-xs text-zinc-500 line-through decoration-rose-500/70">
-      ₹{product.price}
-    </p>
-  )}
-</div>
+                {/* The Slash Cut (ONLY renders if discountedPrice is less than regular price) */}
+                {product.discountedPrice &&
+                  product.discountedPrice < product.price && (
+                    <p className="text-xl text-zinc-500 line-through decoration-rose-500/70">
+                      ₹{product.price}
+                    </p>
+                  )}
+              </div>
             </div>
 
             <Separator className="bg-zinc-800" />

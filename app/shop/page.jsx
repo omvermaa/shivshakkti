@@ -224,7 +224,7 @@ async function ProductGrid({ currentCategory, currentMaxPrice, searchQuery }) {
               </div>
 
               {/* --- NEW: Smart Price Display --- */}
-              <div className="mt-2 flex items-center gap-2">
+              <div className="mt-2 text-2xl flex items-center gap-2">
                 {/* The Main Price (Shows discount if it exists, otherwise shows regular) */}
                 <p
                   className={`font-semibold ${product.stock > 0 ? "text-purple-400" : "text-zinc-500"}`}
@@ -239,7 +239,7 @@ async function ProductGrid({ currentCategory, currentMaxPrice, searchQuery }) {
                 {/* The Slash Cut (ONLY renders if discountedPrice is less than regular price) */}
                 {product.discountedPrice &&
                   product.discountedPrice < product.price && (
-                    <p className="text-xs text-zinc-500 line-through decoration-rose-500/70">
+                    <p className="text-lg text-zinc-500 line-through decoration-rose-500/70">
                       ₹{product.price}
                     </p>
                   )}
