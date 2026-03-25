@@ -329,7 +329,7 @@ export default async function ProductDetails({ params }) {
     <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-28 pb-12 px-6 lg:px-12">
       <div className="max-w-6xl mx-auto">
         
-        <Link href="/shop" className="inline-flex items-center gap-2 text-zinc-400 hover:text-purple-400 transition-colors mb-8 font-medium text-sm">
+        <Link href="/shop" className="inline-flex items-center gap-2 text-zinc-400 hover:text-purple-400 transition-colors mb-8 font-medium text-lg">
           <ArrowLeft className="w-4 h-4" /> Back to Realms
         </Link>
 
