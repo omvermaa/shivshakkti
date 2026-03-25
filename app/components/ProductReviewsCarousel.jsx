@@ -34,7 +34,7 @@ export default function ProductReviewsCarousel({ productName }) {
       id: 3,
       name: "Ananya Kapoor",
       // Authentic Indian Woman Portrait (Updated valid link)
-      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&auto=format&fit=crop",
+      avatar: "https://img.freepik.com/premium-photo/beautiful-indian-woman-slightly-smiling-looking-camera-young-woman-with-beautiful-long-dark_1346048-70391.jpg?semt=ais_rp_50_assets&w=740&q=80",
       text: `Absolutely in love with it. You can actually feel the intention and positivity put into the ${productName}. Will definitely be ordering more items soon.`,
       rating: 5,
       date: "3 weeks ago"
