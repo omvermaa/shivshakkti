@@ -151,10 +151,10 @@ export default function CartDrawer() {
                     
                     <div className="flex-1 flex flex-col justify-between py-1">
                       <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-medium text-sm text-zinc-100 line-clamp-2 leading-tight">
+                        <h3 className="font-medium text-lg text-zinc-100 line-clamp-2 leading-tight">
                           {item.product.name}
                         </h3>
-                        <p className="text-sm text-purple-400 font-semibold whitespace-nowrap">
+                        <p className="text-xl text-purple-400 font-semibold whitespace-nowrap">
                           ₹{item.product.price}
                         </p>
                       </div>
@@ -168,10 +168,10 @@ export default function CartDrawer() {
                             disabled={item.quantity <= 1}
                             className="p-1.5 text-zinc-400 hover:text-white disabled:opacity-30 transition-colors"
                           >
-                            <Minus className="w-3 h-3" />
+                            <Minus className="w-5 h-5" />
                           </button>
                           
-                          <span className="w-8 text-center text-xs font-medium text-zinc-100">
+                          <span className="w-8 text-center text-xm font-medium text-zinc-100">
                             {item.quantity}
                           </span>
                           
@@ -180,7 +180,7 @@ export default function CartDrawer() {
                             disabled={item.quantity >= item.product.stock}
                             className="p-1.5 text-zinc-400 hover:text-white disabled:opacity-30 transition-colors"
                           >
-                            <Plus className="w-3 h-3" />
+                            <Plus className="w-5 h-5" />
                           </button>
                         </div>
 
@@ -191,7 +191,7 @@ export default function CartDrawer() {
                               className="p-1.5 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors"
                               aria-label="Remove item"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-6 h-6" />
                             </button>
                           </AlertDialogTrigger>
                           <AlertDialogContent className="bg-zinc-950 border-zinc-800 text-zinc-50">
@@ -228,7 +228,7 @@ export default function CartDrawer() {
               <span className="text-zinc-400">Total</span>
               <span className="text-xl font-bold text-zinc-100">₹{cartTotal}</span>
             </div>
-            <Button asChild className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_20px_rgba(147,51,234,0.2)]">
+            <Button asChild className="w-full text-lg bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_20px_rgba(147,51,234,0.2)]">
               <Link href="/checkout" onClick={() => setIsOpen(false)}>
                 Proceed to Checkout
               </Link>
